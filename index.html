@@ -6,10 +6,12 @@
 <title>Sócio Baianão</title>
 <meta name="description" content="Clube de vantagens do Baianão: 100 Créditos Vibe por mês, R$ 50 em compras, 10% de cashback e assistências por R$ 49,90/mês.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800;900&family=Inter:wght@400;500;600&display=swap">
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" href="img/logo.webp" as="image" type="image/webp">
+<link rel="modulepreload" href="js/hero.js">
+<script defer src="js/gsap.min.js"></script>
+<script defer src="js/ScrollTrigger.min.js"></script>
+<script defer src="js/lenis.min.js"></script>
 <style>
 /* VOICE: varejo popular baiano com acabamento de marca premium — confiante, quente, direto
    IDEA: a moeda de ouro do clube: a assinatura vira moedas que caem e se dividem em vantagens
@@ -45,17 +47,19 @@ p{margin:0}a{color:inherit}
 
 /* buttons */
 .btn{--x:0px;--y:0px;position:relative;display:inline-flex;align-items:center;gap:10px;min-height:52px;font:700 1rem var(--display);text-decoration:none;padding:14px 30px;border-radius:999px;border:0;cursor:pointer;color:#fff;background:linear-gradient(180deg,#ff2d36,var(--red) 55%,var(--red2));box-shadow:0 12px 34px -8px rgba(247,4,15,.6),inset 0 1px 0 rgba(255,255,255,.35);overflow:hidden;isolation:isolate;transition:box-shadow .3s}
-.btn::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);transform:translateX(-120%);animation:shine 3.6s ease-in-out infinite}
+.btn::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);transform:translateX(-120%)}
+.btn:hover::after{animation:shine2 .9s ease-out}
+@keyframes shine2{to{transform:translateX(120%)}}
 @keyframes shine{0%,60%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
 .btn:hover{box-shadow:0 18px 50px -8px rgba(247,4,15,.8),inset 0 1px 0 rgba(255,255,255,.35)}
-.btn-ghost{background:rgba(255,255,255,.06);color:var(--on);border:1.5px solid rgba(197,206,238,.45);box-shadow:none;backdrop-filter:blur(8px)}
+.btn-ghost{background:rgba(255,255,255,.06);color:var(--on);border:1.5px solid rgba(197,206,238,.45);box-shadow:none;background:rgba(0,26,77,.5)}
 .btn-ghost::after{display:none}
 .btn svg{width:20px;height:20px}
 
 /* header */
 .prog{position:fixed;top:0;left:0;height:3px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--red),#ff5a61);z-index:60}
 header{position:fixed;inset:0 0 auto;z-index:50;background:linear-gradient(rgba(0,26,77,.75),rgba(0,26,77,0));transition:background .4s,backdrop-filter .4s,border-color .4s;border-bottom:1px solid transparent}
-header.solid{background:rgba(0,26,77,.72);backdrop-filter:blur(16px) saturate(1.4);border-color:rgba(255,255,255,.08)}
+header.solid{background:rgba(0,26,77,.96);border-color:rgba(255,255,255,.08)}
 header .wrap{display:flex;align-items:center;gap:26px;height:72px;color:var(--on)}
 .brand{display:flex;align-items:center;gap:10px;text-decoration:none;margin-right:auto;color:var(--on)}
 .brand img{height:40px;width:auto;filter:drop-shadow(0 4px 12px rgba(0,0,0,.35))}
@@ -68,9 +72,10 @@ header .btn{min-height:42px;padding:9px 20px;font-size:.9rem}
 
 /* hero */
 .hero{position:relative;min-height:100svh;display:flex;align-items:center;background:radial-gradient(ellipse 60% 70% at 70% 42%,#1c6cff 0%,#0047C8 28%,#00388A 52%,var(--navy) 85%);color:var(--on);overflow:hidden;padding:110px 0 80px}
-#gl{position:absolute;inset:0;z-index:0}
+#gl{position:absolute;inset:0;z-index:0;opacity:0;transition:opacity 1s}
+#gl.on,#gl.nogl{opacity:1}
 #gl canvas{width:100%!important;height:100%!important;display:block}
-#gl.nogl{background:url(img/logo.webp) 78% 45%/min(42vw,560px) auto no-repeat}
+#gl.nogl{background:url(img/logo.webp) 78% 45%/min(42vw,560px) auto no-repeat,radial-gradient(ellipse 60% 70% at 70% 42%,#1c6cff,#00388A 52%,#001A4D)}
 .hero::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(0,26,77,.85) 0,rgba(0,26,77,.45) 36%,rgba(0,26,77,0) 58%)}
 .kv{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
 .kv i{position:absolute;left:-10%;width:120%;transform:rotate(-7deg)}
@@ -81,17 +86,17 @@ header .btn{min-height:42px;padding:9px 20px;font-size:.9rem}
 .hero::after{display:none;content:"";position:absolute;inset:auto 0 0;height:180px;background:linear-gradient(transparent,var(--navy));pointer-events:none;z-index:1}
 .hero .wrap{position:relative;z-index:2;width:100%}
 .hero-txt{max-width:640px}
-.pill{display:inline-flex;align-items:center;gap:10px;padding:7px 16px 7px 8px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px);font:600 .9rem var(--display);color:var(--on);margin-bottom:26px}
+.pill{display:inline-flex;align-items:center;gap:10px;padding:7px 16px 7px 8px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);font:600 .9rem var(--display);color:var(--on);margin-bottom:26px;background:rgba(0,26,77,.55)}
 .pill i{font-style:normal;white-space:nowrap;background:var(--gold);color:var(--navy);border-radius:999px;padding:2px 10px;font-size:.78rem}
 .hero h1 .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em}
 .hero h1 .w>span{display:inline-block}
 .hero h1 .gold:has(.w){background:none!important;animation:none!important;color:inherit!important}
-.hero h1 .gold,.hero h1 .gold .w>span{background:linear-gradient(100deg,var(--gold-hi) 10%,#fff6d6 35%,var(--gold) 60%,var(--gold-hi) 90%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 6s linear infinite}
+.hero h1 .gold,.hero h1 .gold .w>span{background:linear-gradient(100deg,var(--gold-hi) 10%,#fff6d6 35%,var(--gold) 60%,var(--gold-hi) 90%);-webkit-background-clip:text;background-clip:text;color:transparent}
 @keyframes flow{to{background-position:-220% 0}}
 .hero .lead{color:var(--on-soft)}
 .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}
 .chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:38px}
-.chip{display:flex;align-items:baseline;gap:8px;padding:10px 16px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px)}
+.chip{display:flex;align-items:baseline;gap:8px;padding:10px 16px;border-radius:14px;background:rgba(0,26,77,.6);border:1px solid rgba(255,255,255,.14)}
 .chip b{font:800 1.25rem var(--display);color:var(--gold-hi);white-space:nowrap}
 .chip span{font-size:.88rem;color:var(--on-soft)}
 .scrollhint{position:absolute;left:50%;bottom:26px;z-index:3;transform:translateX(-50%);width:26px;height:42px;border:2px solid rgba(255,255,255,.35);border-radius:14px}
@@ -124,7 +129,7 @@ header .btn{min-height:42px;padding:9px 20px;font-size:.9rem}
 
 /* vantagens */
 .grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-top:44px}
-.card{--mx:50%;--my:50%;position:relative;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:28px;transform-style:preserve-3d;transition:box-shadow .3s,border-color .3s;will-change:transform}
+.card{--mx:50%;--my:50%;position:relative;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:28px;transform-style:preserve-3d;transition:box-shadow .3s,border-color .3s}
 .card::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(380px circle at var(--mx) var(--my),rgba(42,75,216,.12),transparent 45%);opacity:0;transition:opacity .3s}
 .card:hover{box-shadow:0 30px 60px -28px rgba(10,21,80,.35);border-color:#c5d0f2}
 .card:hover::before{opacity:1}
@@ -142,14 +147,18 @@ header .btn{min-height:42px;padding:9px 20px;font-size:.9rem}
 .vlogo{font:900 clamp(3.4rem,8vw,6rem)/.9 var(--display);letter-spacing:-.05em}
 .vlogo em{font-style:normal;font-size:.32em;letter-spacing:0;display:block;margin-top:10px;font-weight:600;opacity:.85}
 .count250{font:900 clamp(2.4rem,5vw,3.6rem)/1 var(--display);margin-top:22px}
-.marq{margin-top:56px;display:grid;gap:14px;mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
-.mrow{display:flex;gap:14px;width:max-content;animation:mq 38s linear infinite}
+.marq{position:relative;margin-top:56px;display:grid;gap:18px;overflow:hidden;padding:6px 0 14px}
+.marq::before,.marq::after{content:"";position:absolute;top:0;bottom:0;width:12%;z-index:2;pointer-events:none}
+.marq::before{left:0;background:linear-gradient(90deg,var(--vibe),rgba(102,95,255,0))}
+.marq::after{right:0;background:linear-gradient(270deg,var(--vibe),rgba(102,95,255,0))}
+.mrow{display:flex;gap:18px;width:max-content;animation:mq 46s linear infinite;will-change:transform}
 .mrow.rev{animation-direction:reverse;animation-duration:44s}
 .marq:hover .mrow{animation-play-state:paused}
 @keyframes mq{to{transform:translateX(-50%)}}
-.brandchip{flex:none;padding:16px 26px;border-radius:18px;background:#0F0F12;color:#fff;font:800 1.15rem var(--display);white-space:nowrap;letter-spacing:-.01em}
-.brandchip:nth-child(3n){background:#fff;color:#0F0F12}
-.brandchip:nth-child(4n){background:rgba(255,255,255,.16)}
+.plogo{flex:none;width:clamp(150px,15vw,200px);aspect-ratio:2/1;border-radius:22px;background:#fff;display:grid;place-items:center;box-shadow:0 14px 30px -16px rgba(20,10,90,.55),inset 0 0 0 1px rgba(15,15,18,.06);transition:transform .3s}
+.plogo:hover{transform:translateY(-4px) scale(1.03)}
+.plogo img{display:block;object-fit:contain;max-width:76%;max-height:62%}
+.plogo span{font:800 1.05rem var(--display);color:#0F0F12;padding:0 12px;text-align:center}
 
 /* simulador */
 .sim{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:28px;margin-top:44px;align-items:stretch}
@@ -226,8 +235,8 @@ mark{background:#FFF0B3;color:inherit;border-radius:3px;padding:0 2px}
 .final .lead{margin-inline:auto}
 .final .btn{margin-top:32px}
 .final .rings{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
-.final .rings i{position:absolute;border:1px solid rgba(243,220,138,.18);border-radius:50%;animation:ring 6s linear infinite}
-@keyframes ring{from{width:120px;height:120px;opacity:1}to{width:1400px;height:1400px;opacity:0}}
+.final .rings i{position:absolute;width:1400px;height:1400px;border:2px solid rgba(243,220,138,.16);border-radius:50%;animation:ring 6s linear infinite;will-change:transform,opacity}
+@keyframes ring{from{transform:scale(.09);opacity:1}to{transform:scale(1);opacity:0}}
 
 /* regulamento */
 body.is-lp #regulamento{display:none}
@@ -250,7 +259,7 @@ footer a{color:var(--on)}
 .fab .orb{width:40px;height:40px;border-radius:50%;background:conic-gradient(from 0deg,var(--gold),#fff3c4,var(--vibe),var(--royal),var(--gold));animation:spin 4s linear infinite;position:relative}
 .fab .orb::after{content:"";position:absolute;inset:4px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#2a4bd8,var(--navy))}
 @keyframes spin{to{transform:rotate(360deg)}}
-.chat{position:fixed;right:20px;bottom:88px;z-index:71;width:min(400px,calc(100vw - 24px));height:min(600px,calc(100svh - 120px));display:flex;flex-direction:column;border-radius:26px;background:rgba(6,18,80,.92);backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(243,220,138,.25);color:var(--on);box-shadow:0 40px 90px -20px rgba(0,0,0,.6);transform-origin:100% 100%;transform:scale(.6) translateY(30px);opacity:0;pointer-events:none;transition:transform .45s cubic-bezier(.2,1.2,.3,1),opacity .3s}
+.chat{position:fixed;right:20px;bottom:88px;z-index:71;width:min(400px,calc(100vw - 24px));height:min(600px,calc(100svh - 120px));display:flex;flex-direction:column;border-radius:26px;background:rgba(0,26,77,.97);border:1px solid rgba(243,220,138,.25);color:var(--on);box-shadow:0 40px 90px -20px rgba(0,0,0,.6);transform-origin:100% 100%;transform:scale(.6) translateY(30px);opacity:0;pointer-events:none;transition:transform .45s cubic-bezier(.2,1.2,.3,1),opacity .3s}
 .chat.open{transform:none;opacity:1;pointer-events:auto}
 .chat-h{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
 .chat-h .orb{width:34px;height:34px;flex:none}
@@ -275,8 +284,9 @@ footer a{color:var(--on)}
 /* cursor */
 .cur,.cur2{position:fixed;left:0;top:0;pointer-events:none;z-index:90;border-radius:50%;display:none}
 .cur{width:8px;height:8px;margin:-4px 0 0 -4px;background:var(--gold-hi)}
-.cur2{width:40px;height:40px;margin:-20px 0 0 -20px;border:1.5px solid rgba(215,187,90,.6);transition:width .25s,height .25s,margin .25s,background .25s}
-.cur2.big{width:70px;height:70px;margin:-35px 0 0 -35px;background:rgba(243,220,138,.12)}
+.cur2{width:40px;height:40px;margin:-20px 0 0 -20px;border:1.5px solid rgba(215,187,90,.6)}
+.cur2 b{position:absolute;inset:-1.5px;border-radius:50%;transition:transform .25s,background .25s}
+.cur2.big b{transform:scale(1.75);background:rgba(243,220,138,.12)}
 @media (pointer:fine){.cur,.cur2{display:block}}
 .grain{position:fixed;inset:0;pointer-events:none;z-index:80;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
@@ -310,8 +320,7 @@ footer a{color:var(--on)}
 </head>
 <body class="is-lp">
 <div class="prog" id="prog"></div>
-<div class="grain" aria-hidden="true"></div>
-<div class="cur" id="cur" aria-hidden="true"></div><div class="cur2" id="cur2" aria-hidden="true"></div>
+<div class="cur" id="cur" aria-hidden="true"></div><div class="cur2" id="cur2" aria-hidden="true"><b></b></div>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
@@ -333,7 +342,7 @@ footer a{color:var(--on)}
 <main id="topo">
 
 <section class="hero" aria-labelledby="t-hero">
-  <div class="kv" aria-hidden="true"><i class="rays"></i><i class="r2"></i><i class="w1"></i><i class="r1"></i></div>
+  <div class="kv" aria-hidden="true"><i class="r2"></i><i class="w1"></i><i class="r1"></i></div>
   <div id="gl" aria-hidden="true"></div>
   <div class="wrap">
     <div class="hero-txt">
@@ -570,110 +579,7 @@ footer a{color:var(--on)}
   <form id="cf"><input id="ci" autocomplete="off" placeholder="Pergunte qualquer coisa sobre o clube" aria-label="Sua pergunta"><button aria-label="Enviar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
 </div>
 
-<script type="module">
-/* WebGL: logo 3D do Baianão + moedas de ouro com o logo */
-const host=document.getElementById('gl');
-const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-try{
-  const THREE=await import('three');
-  const {RoomEnvironment}=await import('three/addons/environments/RoomEnvironment.js');
-  const {EffectComposer}=await import('three/addons/postprocessing/EffectComposer.js');
-  const {RenderPass}=await import('three/addons/postprocessing/RenderPass.js');
-  const {UnrealBloomPass}=await import('three/addons/postprocessing/UnrealBloomPass.js');
-  const {OutputPass}=await import('three/addons/postprocessing/OutputPass.js');
-  const logo=new Image();logo.src='img/logo.webp';await logo.decode();await document.fonts.ready;
-  const LW=logo.naturalWidth,LH=logo.naturalHeight;
-  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));
-  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1;
-  renderer.setClearColor(0x000000,0);host.appendChild(renderer.domElement);
-  const scene=new THREE.Scene();
-  {const bc=document.createElement('canvas');bc.width=bc.height=1024;const bg=bc.getContext('2d');const wide=innerWidth>760;const gx=wide?720:512,gy=wide?430:300;const rg=bg.createRadialGradient(gx,gy,0,gx,gy,760);rg.addColorStop(0,'#1f72ff');rg.addColorStop(.28,'#0050d0');rg.addColorStop(.55,'#00388A');rg.addColorStop(1,'#001A4D');bg.fillStyle=rg;bg.fillRect(0,0,1024,1024);const bt=new THREE.CanvasTexture(bc);bt.colorSpace=THREE.SRGBColorSpace;scene.background=bt;}
-  const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),0.04).texture;
-  const cam=new THREE.PerspectiveCamera(35,1,.1,100);cam.position.set(0,0,15);
-  const aniso=renderer.capabilities.getMaxAnisotropy();
-  const tex=c=>{const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=aniso;return t};
-
-  /* ---- logo 3D ---- */
-  const U=100; // px por unidade
-  const lc=document.createElement('canvas');lc.width=LW*2;lc.height=LH*2;const lg=lc.getContext('2d');lg.imageSmoothingQuality='high';lg.drawImage(logo,0,0,lc.width,lc.height);
-  const logoTex=tex(lc);
-  // letras brancas isoladas (para dar relevo)
-  const wc=document.createElement('canvas');wc.width=lc.width;wc.height=lc.height;const wg=wc.getContext('2d');wg.drawImage(lc,0,0);
-  const id=wg.getImageData(0,0,wc.width,wc.height),d=id.data;
-  for(let i=0;i<d.length;i+=4){const m=Math.min(d[i],d[i+1],d[i+2]);const a=Math.max(0,Math.min(1,(m-120)/110))*(d[i+3]/255);d[i]=d[i+1]=d[i+2]=255;d[i+3]=a*255}
-  wg.putImageData(id,0,0);const whiteTex=tex(wc);
-  const pill=(w,h,r)=>{const s=new THREE.Shape(),x=-w/2,y=-h/2;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);return s};
-  const shear=new THREE.Matrix4().set(1,.23,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
-  const body=(color,depth)=>{const g=new THREE.ExtrudeGeometry(pill(5.95,1.72,.62),{depth,bevelEnabled:true,bevelThickness:.08,bevelSize:.06,bevelSegments:6,curveSegments:24});g.applyMatrix4(shear);g.translate(0,0,-depth-.08);
-    return new THREE.Mesh(g,new THREE.MeshPhysicalMaterial({color,roughness:.28,metalness:.15,clearcoat:1,clearcoatRoughness:.12}))};
-  const L=new THREE.Group();
-  const blue=body(0x0046B0,.55);blue.position.set(.02,.125,-.005);L.add(blue);
-  const red=body(0xF7040F,.55);red.position.set(-.1,-.12,-.2);L.add(red);
-  const face=new THREE.Mesh(new THREE.PlaneGeometry(LW/U,LH/U),new THREE.MeshPhysicalMaterial({map:logoTex,transparent:true,alphaTest:.5,roughness:.3,clearcoat:1,clearcoatRoughness:.1}));face.position.z=.002;L.add(face);
-  const lettersM=[];for(let k=1;k<=6;k++){const m=new THREE.MeshStandardMaterial({map:whiteTex,transparent:true,alphaTest:.5,color:k===6?0xffffff:new THREE.Color().setHSL(.61,.3,.62+k*.04),roughness:.4,metalness:0});
-    const pl=new THREE.Mesh(new THREE.PlaneGeometry(LW/U,LH/U),m);pl.position.z=.004+k*.013;L.add(pl);lettersM.push(m)}
-  scene.add(L);
-
-  /* ---- moedas com o logo ---- */
-  const fc=document.createElement('canvas');fc.width=fc.height=512;const g=fc.getContext('2d');
-  const gr=g.createRadialGradient(200,170,30,256,256,280);gr.addColorStop(0,'#FFF4C8');gr.addColorStop(.5,'#E6C866');gr.addColorStop(1,'#8E6E1C');
-  g.fillStyle=gr;g.fillRect(0,0,512,512);
-  g.strokeStyle='rgba(92,62,6,.5)';g.lineWidth=16;g.beginPath();g.arc(256,256,224,0,7);g.stroke();
-  g.lineWidth=4;g.beginPath();g.arc(256,256,196,0,7);g.stroke();
-  for(let i=0;i<72;i++){const a=i/72*Math.PI*2;g.save();g.translate(256+Math.cos(a)*240,256+Math.sin(a)*240);g.rotate(a);g.fillStyle='rgba(92,62,6,.35)';g.fillRect(-2,-7,4,14);g.restore()}
-  const lw=330,lh=lw*LH/LW;g.shadowColor='rgba(60,40,0,.45)';g.shadowBlur=14;g.shadowOffsetY=6;g.drawImage(logo,256-lw/2,262-lh/2,lw,lh);g.shadowColor='transparent';
-  g.fillStyle='rgba(78,52,4,.82)';g.textAlign='center';g.textBaseline='middle';g.font='800 44px Poppins, Arial';g.fillText('SÓCIO',256,140);
-  g.font='700 30px Poppins, Arial';g.fillText('★  100 CRÉDITOS  ★',256,382);
-  const coinFace=tex(fc);
-  const cg=new THREE.CylinderGeometry(1,1,.16,72,1);cg.rotateX(Math.PI/2);
-  const mats=[new THREE.MeshStandardMaterial({color:0xD7BB5A,metalness:1,roughness:.3}),new THREE.MeshStandardMaterial({map:coinFace,metalness:.85,roughness:.28}),new THREE.MeshStandardMaterial({map:coinFace,metalness:.85,roughness:.28})];
-  const small=innerWidth<760;const N=small?34:80;
-  const inst=new THREE.InstancedMesh(cg,mats,N);inst.instanceMatrix.setUsage(THREE.DynamicDrawUsage);scene.add(inst);
-  const P=[];for(let i=0;i<N;i++)P.push({r:(small?2.6:3.6)+Math.random()*(small?2.6:4.4),a:Math.random()*6.28,y:(Math.random()-.5)*14,sp:(.15+Math.random()*.25)*(Math.random()<.5?1:-1),f:.3+Math.random()*.6,s:(small?.22:.3)+Math.random()*.38,rx:Math.random()*6,ry:Math.random()*6,vx:.4+Math.random()*1.4,vy:.3+Math.random()*1.2,b:Math.random()});
-
-  const key=new THREE.DirectionalLight(0xffffff,3);key.position.set(3,6,9);scene.add(key);
-  const rim=new THREE.DirectionalLight(0xff3040,2);rim.position.set(-7,-3,-3);scene.add(rim);
-  const rim2=new THREE.DirectionalLight(0x5aa0ff,3);rim2.position.set(7,4,-4);scene.add(rim2);
-  scene.add(new THREE.AmbientLight(0x3050a0,.5));
-  const comp=new EffectComposer(renderer);comp.addPass(new RenderPass(scene,cam));
-  const bloom=new UnrealBloomPass(new THREE.Vector2(1,1),.22,.4,1.05);comp.addPass(bloom);comp.addPass(new OutputPass());
-  let cx=0,cy=0,ls=1;
-  function size(){const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h,false);comp.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix();
-    const wide=w>760;cx=wide?Math.min(5.4,(w/h)*2.75):0;cy=wide?.2:3.1;
-    const visW=2*Math.tan(cam.fov*Math.PI/360)*15*cam.aspect;ls=wide?Math.min(.95,visW*.33/6.4):Math.min(.95,visW*.86/6.4)}
-  const ro=new ResizeObserver(size);ro.observe(host);size();
-  let mx=0,my=0,tx=0,ty=0;
-  addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5},{passive:true});
-  let vis=true;new IntersectionObserver(([e])=>{vis=e.isIntersecting}).observe(host);
-  const m=new THREE.Matrix4(),q=new THREE.Quaternion(),eu=new THREE.Euler(),v=new THREE.Vector3(),sc=new THREE.Vector3();
-  const clock=new THREE.Clock();let T=0;const INTRO=reduce?0:2.2;
-  const easeOutBack=x=>{const c1=1.5,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
-  const easeOut=x=>1-Math.pow(1-x,4);
-  function frame(){
-    requestAnimationFrame(frame);if(!vis)return;
-    const dt=Math.min(clock.getDelta(),.05);T+=dt;const mt=reduce?0:T;
-    tx+=(mx-tx)*.06;ty+=(my-ty)*.06;
-    const sy=scrollY/innerHeight;
-    cam.position.set(tx*1.2,-ty*.9-sy*1.4,15+sy*3);cam.lookAt(cx*.3,cy*.25-sy*1.4,0);
-    /* logo: entrada girando + flutuação + segue o mouse */
-    const k=INTRO?Math.min(1,T/INTRO):1;
-    const s=ls*easeOutBack(Math.min(1,k*1.15));
-    L.scale.setScalar(Math.max(.001,s));
-    L.position.set(cx,cy+Math.sin(mt*1.1)*.12+(1-easeOut(k))*-3,0);
-    L.rotation.set(-ty*.45+Math.sin(mt*.8)*.05+sy*.4,(1-easeOut(k))*Math.PI*2.5+tx*.9+Math.sin(mt*.5)*.12,(1-easeOut(k))*-.4+Math.sin(mt*.6)*.03);
-    /* moedas: explodem do logo e entram em órbita */
-    const burst=easeOut(Math.min(1,T/(INTRO+.6||1)));
-    for(let i=0;i<N;i++){const p=P[i];p.a+=p.sp*dt*(reduce?0:1);p.y-=p.f*dt*(reduce?0:1);if(p.y<-8)p.y=8;
-      const r=p.r*(.15+.85*burst);
-      v.set(cx+Math.cos(p.a)*r,cy+p.y*burst,Math.sin(p.a)*r*.45-2.6);
-      eu.set(p.rx+mt*p.vx,p.ry+mt*p.vy,0);q.setFromEuler(eu);sc.setScalar(p.s*Math.min(1,burst*1.4));m.compose(v,q,sc);inst.setMatrixAt(i,m)}
-    inst.instanceMatrix.needsUpdate=true;
-    comp.render();
-  }
-  frame();
-}catch(err){console.warn(err);host.classList.add('nogl')}
-</script>
+<script type="module" src="js/hero.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded',()=>{
@@ -689,10 +595,14 @@ const brl=v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:v%1?2:0,maxim
 if(WHATSAPP){const u='https://wa.me/'+WHATSAPP+'?text='+encodeURIComponent('Olá! Quero ser Sócio Baianão.');document.querySelectorAll('.wa').forEach(a=>{a.href=u;a.target='_blank';a.rel='noopener'});document.querySelectorAll('.waph').forEach(p=>p.remove())}
 
 /* marcas */
-const brands=['Cacau Show','Natura','Drogasil','O Boticário','Cinemark','Petz','Burger King','Netshoes','Uber','Renner','Assaí','Domino’s','Outback','Globoplay'];
-const row=a=>{const h=a.map(b=>'<span class="brandchip">'+b+'</span>').join('');return h+h};
+const W='https://upload.wikimedia.org/wikipedia/';
+const brands=[['Cacau Show','commons/4/4c/Logotipo_da_Cacau_Show_%282025%29.svg',1.89],['Natura','pt/7/7e/Logotipo_da_Natura_%282024%29.svg',1.9],['Drogasil','commons/a/ad/Logotipo_da_Drogasil_%282024%29.svg',6.17],['O Boticário','commons/d/de/Logotipo_do_O_Botic%C3%A1rio.svg',7.69],['Cinemark','commons/c/cd/Cinemark_Logo.svg',5.52],['Petz','commons/c/c4/Logotipo_da_Petz_%282023%29.svg',3],['Burger King','commons/c/cc/Burger_King_2020.svg',.92],['Netshoes','commons/7/7c/Netshoes_2024.svg',6.4],['Uber','commons/5/58/Uber_logo_2018.svg',2.88],['Renner','commons/d/d4/Logotipo_das_Lojas_Renner.svg',5.43],['Assaí','commons/5/5c/Assa%C3%AD_Atacadista_logo_2024.svg',1.38],['Domino’s','commons/3/3e/Domino%27s_pizza_logo.svg',1],['Outback','commons/9/9f/OutbackLogo.png',3.88],['Globoplay','commons/b/b0/Globoplay_logo_2020.svg',4.57]];
+/* tamanho óptico: mesma área visual para todo logo, limitado à caixa */
+window.fitLogo=img=>{const r=img.naturalWidth/img.naturalHeight;if(!r||!isFinite(r))return;const [w,h]=size(r);img.style.width=w+'px';img.style.height=h+'px'};
+const size=r=>{const A=2900;let w=Math.sqrt(A*r),h=Math.sqrt(A/r);if(w>132){w=132;h=w/r}if(h>58){h=58;w=h*r}return [Math.round(w),Math.round(h)]};
+const row=a=>{const h=a.map(([n,u,r])=>{const [w,hh]=size(r);return '<div class="plogo" title="'+n+'"><img src="'+W+u+'" alt="'+n+'" width="'+w+'" height="'+hh+'" style="width:'+w+'px;height:'+hh+'px" loading="lazy" decoding="async" onload="fitLogo(this)" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{textContent:this.alt}))"></div>'}).join('');return h+h};
 document.getElementById('m1').innerHTML=row(brands);
-document.getElementById('m2').innerHTML=row(brands.slice(7).concat(brands.slice(0,7)));
+document.getElementById('m2').innerHTML=row(brands.slice(7).concat(brands.slice(0,7)));document.querySelectorAll('#m2 .plogo,#m1 .plogo').forEach((el,i)=>{if(i%14>=0)el.setAttribute('aria-hidden',i%28>=14?'true':'false')});
 
 /* rolagem suave */
 let lenis=null;
@@ -775,7 +685,7 @@ if(FINE&&!REDUCE)document.querySelectorAll('.tilt').forEach(c=>{
 /* cursor */
 if(FINE&&!REDUCE){const c1=document.getElementById('cur'),c2=document.getElementById('cur2');let x=-99,y=-99,x2=-99,y2=-99;
   addEventListener('pointermove',e=>{x=e.clientX;y=e.clientY;c1.style.transform='translate('+x+'px,'+y+'px)'},{passive:true});
-  const loop=()=>{x2+=(x-x2)*.16;y2+=(y-y2)*.16;c2.style.transform='translate('+x2+'px,'+y2+'px)';requestAnimationFrame(loop)};loop();
+  let lp=false;const loop=()=>{x2+=(x-x2)*.18;y2+=(y-y2)*.18;c2.style.transform='translate('+x2+'px,'+y2+'px)';if(Math.abs(x-x2)+Math.abs(y-y2)>.3)requestAnimationFrame(loop);else lp=false};addEventListener('pointermove',()=>{if(!lp){lp=true;requestAnimationFrame(loop)}},{passive:true});
   document.addEventListener('pointerover',e=>c2.classList.toggle('big',!!e.target.closest('a,button,summary,input,.tilt')))}
 else{document.getElementById('cur').remove();document.getElementById('cur2').remove()}
 
