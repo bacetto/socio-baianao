@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sócio Baianão</title>
+<meta name="description" content="Clube de vantagens do Baianão: 100 Créditos Vibe por mês, R$ 50 em compras, 10% de cashback e assistências por R$ 49,90/mês.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800;900&family=Inter:wght@400;500;600&display=swap">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"}}</script>
+<style>
+/* VOICE: varejo popular baiano com acabamento de marca premium — confiante, quente, direto
+   IDEA: a moeda de ouro do clube: a assinatura vira moedas que caem e se dividem em vantagens
+   PICTURE: redemoinho 3D de moedas douradas em WebGL com bloom, que segue o mouse
+   COLOUR and TYPE: azul-marinho e ouro do Baianão, roxo do Vibe só na seção dele; Poppins 800 + Inter
+   LAYOUT: bandas cheias; hero de tela inteira, seção da conta fixada no scroll, simulador ao vivo */
+:root{
+  --navy:#001A4D;--navy2:#00388A;--blue:#00388A;--royal:#0047C8;--red:#F7040F;--red2:#C80009;--gold:#D7BB5A;--gold-hi:#F3DC8A;--gold-lo:#9C7A22;
+  --paper:#F4F6FC;--card:#FFFFFF;--line:#DCE3F7;--ink:#0A1550;--ink-soft:#3A4573;--on:#F4F7FF;--on-soft:#C5CEEE;--vibe:#665FFF;
+  --display:'Poppins','Trebuchet MS',Arial,sans-serif;--body:'Inter',Arial,sans-serif;color-scheme:light;
+}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:80px}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 var(--body);overflow-x:clip;-webkit-font-smoothing:antialiased}
+img,svg{display:block;max-width:100%}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.06;text-wrap:balance}
+h1{font-size:clamp(2.5rem,6.2vw,5rem);font-weight:900;letter-spacing:-.025em}
+h2{font-size:clamp(1.9rem,4vw,3.1rem);font-weight:800;letter-spacing:-.02em}
+h3{font-size:1.25rem;font-weight:700}
+p{margin:0}a{color:inherit}
+:focus-visible{outline:3px solid var(--gold-hi);outline-offset:3px;border-radius:8px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 max(4vw,18px)}
+.band{padding:clamp(64px,9vw,120px) 0;position:relative}
+.kick{font-family:var(--display);font-weight:600;font-size:.95rem;color:var(--royal);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.kick::before{content:"";width:26px;height:4px;background:var(--red);border-radius:2px;transform:skewX(-20deg)}
+.dark{background:var(--navy);color:var(--on)}.dark .kick,.conta .kick{color:var(--gold)}
+.lead{font-size:clamp(1.05rem,1.6vw,1.25rem);color:var(--ink-soft);max-width:60ch;margin-top:18px}
+.dark .lead{color:var(--on-soft)}
+.fine{font-size:.88rem;color:var(--ink-soft);margin-top:14px}.dark .fine{color:var(--on-soft)}
+.ph{background:#FFF4C7;color:#5A4300;border:1px dashed #B8943A;border-radius:6px;padding:0 6px;font-size:.92em}
+
+/* buttons */
+.btn{--x:0px;--y:0px;position:relative;display:inline-flex;align-items:center;gap:10px;min-height:52px;font:700 1rem var(--display);text-decoration:none;padding:14px 30px;border-radius:999px;border:0;cursor:pointer;color:#fff;background:linear-gradient(180deg,#ff2d36,var(--red) 55%,var(--red2));box-shadow:0 12px 34px -8px rgba(247,4,15,.6),inset 0 1px 0 rgba(255,255,255,.35);overflow:hidden;isolation:isolate;transition:box-shadow .3s}
+.btn::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);transform:translateX(-120%);animation:shine 3.6s ease-in-out infinite}
+@keyframes shine{0%,60%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+.btn:hover{box-shadow:0 18px 50px -8px rgba(247,4,15,.8),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn-ghost{background:rgba(255,255,255,.06);color:var(--on);border:1.5px solid rgba(197,206,238,.45);box-shadow:none;backdrop-filter:blur(8px)}
+.btn-ghost::after{display:none}
+.btn svg{width:20px;height:20px}
+
+/* header */
+.prog{position:fixed;top:0;left:0;height:3px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--red),#ff5a61);z-index:60}
+header{position:fixed;inset:0 0 auto;z-index:50;background:linear-gradient(rgba(0,26,77,.75),rgba(0,26,77,0));transition:background .4s,backdrop-filter .4s,border-color .4s;border-bottom:1px solid transparent}
+header.solid{background:rgba(0,26,77,.72);backdrop-filter:blur(16px) saturate(1.4);border-color:rgba(255,255,255,.08)}
+header .wrap{display:flex;align-items:center;gap:26px;height:72px;color:var(--on)}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;margin-right:auto;color:var(--on)}
+.brand img{height:40px;width:auto;filter:drop-shadow(0 4px 12px rgba(0,0,0,.35))}
+.brand .tag{font:800 .8rem var(--display);padding:5px 12px;border-radius:999px;background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:var(--navy);transform:skewX(-10deg)}
+nav{display:flex;gap:24px;font-size:.95rem}
+nav a{white-space:nowrap;text-decoration:none;color:var(--on-soft);position:relative;padding:6px 0}
+nav a::after{content:"";position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--gold);transform:scaleX(0);transform-origin:right;transition:transform .35s}
+nav a:hover{color:var(--on)}nav a:hover::after{transform:scaleX(1);transform-origin:left}
+header .btn{min-height:42px;padding:9px 20px;font-size:.9rem}
+
+/* hero */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;background:radial-gradient(ellipse 60% 70% at 70% 42%,#1c6cff 0%,#0047C8 28%,#00388A 52%,var(--navy) 85%);color:var(--on);overflow:hidden;padding:110px 0 80px}
+#gl{position:absolute;inset:0;z-index:0}
+#gl canvas{width:100%!important;height:100%!important;display:block}
+#gl.nogl{background:url(img/logo.webp) 78% 45%/min(42vw,560px) auto no-repeat}
+.hero::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(0,26,77,.85) 0,rgba(0,26,77,.45) 36%,rgba(0,26,77,0) 58%)}
+.kv{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+.kv i{position:absolute;left:-10%;width:120%;transform:rotate(-7deg)}
+.kv .r1{bottom:-90px;height:210px;background:linear-gradient(180deg,#ff2d36,var(--red) 40%,var(--red2));box-shadow:0 -30px 80px rgba(247,4,15,.35)}
+.kv .w1{bottom:116px;height:10px;background:#fff;opacity:.9}
+.kv .r2{top:-160px;height:190px;background:var(--red);opacity:.9;transform:rotate(-7deg) translateX(62%)}
+.kv .rays{mix-blend-mode:screen;inset:0;width:auto;left:0;transform:none;background:repeating-conic-gradient(from 0deg at 70% 42%,rgba(255,255,255,.07) 0 6deg,transparent 6deg 18deg);mask-image:radial-gradient(circle at 70% 42%,#000 0,transparent 60%);animation:spin 120s linear infinite}
+.hero::after{display:none;content:"";position:absolute;inset:auto 0 0;height:180px;background:linear-gradient(transparent,var(--navy));pointer-events:none;z-index:1}
+.hero .wrap{position:relative;z-index:2;width:100%}
+.hero-txt{max-width:640px}
+.pill{display:inline-flex;align-items:center;gap:10px;padding:7px 16px 7px 8px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(10px);font:600 .9rem var(--display);color:var(--on);margin-bottom:26px}
+.pill i{font-style:normal;white-space:nowrap;background:var(--gold);color:var(--navy);border-radius:999px;padding:2px 10px;font-size:.78rem}
+.hero h1 .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.08em}
+.hero h1 .w>span{display:inline-block}
+.hero h1 .gold:has(.w){background:none!important;animation:none!important;color:inherit!important}
+.hero h1 .gold,.hero h1 .gold .w>span{background:linear-gradient(100deg,var(--gold-hi) 10%,#fff6d6 35%,var(--gold) 60%,var(--gold-hi) 90%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:flow 6s linear infinite}
+@keyframes flow{to{background-position:-220% 0}}
+.hero .lead{color:var(--on-soft)}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:38px}
+.chip{display:flex;align-items:baseline;gap:8px;padding:10px 16px;border-radius:14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(10px)}
+.chip b{font:800 1.25rem var(--display);color:var(--gold-hi);white-space:nowrap}
+.chip span{font-size:.88rem;color:var(--on-soft)}
+.scrollhint{position:absolute;left:50%;bottom:26px;z-index:3;transform:translateX(-50%);width:26px;height:42px;border:2px solid rgba(255,255,255,.35);border-radius:14px}
+.scrollhint::before{content:"";position:absolute;left:50%;top:8px;width:4px;height:8px;margin-left:-2px;border-radius:2px;background:var(--gold);animation:dot 1.8s infinite}
+@keyframes dot{0%{opacity:0;transform:translateY(0)}40%{opacity:1}100%{opacity:0;transform:translateY(14px)}}
+
+/* conta (pinned) */
+.conta{background:var(--navy);color:var(--on);overflow:hidden}
+.conta .stage{min-height:100svh;display:flex;align-items:center;padding:100px 0 60px}
+.conta h2{max-width:16ch}
+.flow{display:grid;grid-template-columns:minmax(0,1fr) 90px minmax(0,1fr);gap:18px;align-items:center;margin-top:44px}
+.tile{position:relative;border-radius:26px;padding:30px 32px;background:linear-gradient(160deg,#0e2378,#081655);border:1px solid rgba(255,255,255,.1);box-shadow:0 30px 80px -30px rgba(0,0,0,.7)}
+.tile small{font:600 .92rem var(--display);color:var(--gold)}
+.tile strong{display:block;font:900 clamp(2.6rem,6.5vw,4.6rem)/1.05 var(--display);color:var(--gold-hi);font-variant-numeric:tabular-nums;white-space:nowrap;margin:6px 0}
+.tile span{color:var(--on-soft)}
+.tile.vibe-t{background:linear-gradient(160deg,#7B75FF,#4C45E0);border-color:rgba(255,255,255,.25)}
+.tile.vibe-t small,.tile.vibe-t strong,.tile.vibe-t span{color:#fff}
+.vrow{display:flex;align-items:center;gap:16px}
+.vibe-mark{font:900 2.4rem/1 var(--display);letter-spacing:-.04em;color:#fff}
+.arrow svg{width:90px;height:40px;overflow:visible}
+.arrow path{stroke:var(--gold);stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.split{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:22px}
+.half{border-radius:22px;padding:22px 26px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);display:flex;gap:18px;align-items:center}
+.half .ico{flex:none;width:58px;height:58px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:var(--navy);font:900 1.1rem var(--display)}
+.half.v .ico{background:var(--vibe);color:#fff}
+.half b{display:block;font:800 1.35rem/1.2 var(--display);color:var(--gold-hi)}
+.half span{color:var(--on-soft);font-size:.95rem}
+.bonus{margin-top:22px;display:flex;flex-wrap:wrap;gap:10px;font:600 1.05rem var(--display)}
+.bonus span{padding:8px 16px;border-radius:999px;border:1px solid rgba(243,220,138,.4);color:var(--gold-hi)}
+
+/* vantagens */
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-top:44px}
+.card{--mx:50%;--my:50%;position:relative;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:28px;transform-style:preserve-3d;transition:box-shadow .3s,border-color .3s;will-change:transform}
+.card::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(380px circle at var(--mx) var(--my),rgba(42,75,216,.12),transparent 45%);opacity:0;transition:opacity .3s}
+.card:hover{box-shadow:0 30px 60px -28px rgba(10,21,80,.35);border-color:#c5d0f2}
+.card:hover::before{opacity:1}
+.card .ic{width:54px;height:54px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(160deg,var(--navy2),var(--royal));color:var(--gold-hi);margin-bottom:22px;transform:translateZ(30px)}
+.card .ic svg{width:26px;height:26px}
+.card h3{transform:translateZ(20px)}
+.card p{color:var(--ink-soft);margin-top:10px;font-size:.98rem}
+.card .big{font:900 2.2rem/1 var(--display);color:var(--royal);margin-bottom:6px;transform:translateZ(24px)}
+
+/* vibe */
+.vibe{background:var(--vibe);color:#fff;overflow:hidden}
+.vibe .kick{color:#fff}
+.vibe .lead,.vibe .fine{color:#F1F0FF}
+.vibe-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:end}
+.vlogo{font:900 clamp(3.4rem,8vw,6rem)/.9 var(--display);letter-spacing:-.05em}
+.vlogo em{font-style:normal;font-size:.32em;letter-spacing:0;display:block;margin-top:10px;font-weight:600;opacity:.85}
+.count250{font:900 clamp(2.4rem,5vw,3.6rem)/1 var(--display);margin-top:22px}
+.marq{margin-top:56px;display:grid;gap:14px;mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent)}
+.mrow{display:flex;gap:14px;width:max-content;animation:mq 38s linear infinite}
+.mrow.rev{animation-direction:reverse;animation-duration:44s}
+.marq:hover .mrow{animation-play-state:paused}
+@keyframes mq{to{transform:translateX(-50%)}}
+.brandchip{flex:none;padding:16px 26px;border-radius:18px;background:#0F0F12;color:#fff;font:800 1.15rem var(--display);white-space:nowrap;letter-spacing:-.01em}
+.brandchip:nth-child(3n){background:#fff;color:#0F0F12}
+.brandchip:nth-child(4n){background:rgba(255,255,255,.16)}
+
+/* simulador */
+.sim{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:28px;margin-top:44px;align-items:stretch}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:clamp(22px,3vw,34px)}
+.field{margin-bottom:28px}
+.field label{display:flex;justify-content:space-between;gap:12px;font:600 1rem var(--display);margin-bottom:12px}
+.field output{color:var(--royal);font-variant-numeric:tabular-nums;white-space:nowrap}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:44px;background:transparent;cursor:pointer;--p:50%}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:8px;background:linear-gradient(90deg,var(--royal) var(--p),var(--line) var(--p))}
+input[type=range]::-moz-range-track{height:8px;border-radius:8px;background:linear-gradient(90deg,var(--royal) var(--p),var(--line) var(--p))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:26px;height:26px;margin-top:-9px;border-radius:50%;background:linear-gradient(180deg,var(--gold-hi),var(--gold));border:3px solid #fff;box-shadow:0 4px 14px rgba(10,21,80,.35)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--gold);border:3px solid #fff;box-shadow:0 4px 14px rgba(10,21,80,.35)}
+.presets{display:flex;gap:8px;flex-wrap:wrap}
+.presets button{min-height:44px;padding:8px 16px;border-radius:999px;border:1px solid var(--line);background:var(--paper);font:600 .9rem var(--display);color:var(--ink);cursor:pointer}
+.presets button[aria-pressed=true]{background:var(--navy);color:var(--gold-hi);border-color:var(--navy)}
+.result{background:radial-gradient(circle at 80% 0%,#12308f,var(--navy) 60%);color:var(--on);border-radius:26px;padding:clamp(24px,3vw,38px);display:flex;flex-direction:column;position:relative;overflow:hidden}
+.result small{font:600 1rem var(--display);color:var(--gold)}
+.result .num{font:900 clamp(3rem,7vw,5.2rem)/1 var(--display);color:var(--gold-hi);font-variant-numeric:tabular-nums;margin:10px 0 4px;white-space:nowrap}
+.result .sub{color:var(--on-soft)}
+.bars{margin-top:30px;display:grid;gap:16px}
+.bar .lab{display:flex;justify-content:space-between;font-size:.92rem;color:var(--on-soft);margin-bottom:6px}
+.bar .lab b{color:var(--on);font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar .tr{height:16px;border-radius:10px;background:rgba(255,255,255,.08);overflow:hidden}
+.bar .fl{height:100%;border-radius:10px;width:0;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.bar.c .fl{background:rgba(197,206,238,.55)}
+.bar.r .fl{background:linear-gradient(90deg,var(--gold),var(--gold-hi))}
+.breakdown{margin-top:auto;padding-top:26px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.breakdown div{background:rgba(255,255,255,.06);border-radius:14px;padding:12px}
+.breakdown b{display:block;font:800 1.1rem var(--display);color:var(--gold-hi);white-space:nowrap;font-variant-numeric:tabular-nums}
+.breakdown span{font-size:.8rem;color:var(--on-soft)}
+
+/* assistências */
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:44px}
+.acard{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:clamp(22px,3vw,34px);position:relative;overflow:hidden}
+.acard .art{position:absolute;right:-20px;top:-20px;width:150px;height:150px;opacity:.9}
+.facts{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0}
+.fact{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:10px 14px}
+.fact b{display:block;font:800 1.15rem var(--display);color:var(--royal);white-space:nowrap}
+.fact span{font-size:.85rem;color:var(--ink-soft)}
+.checks{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 18px;color:var(--ink-soft)}
+.checks li{display:flex;gap:9px;align-items:flex-start}
+.checks li::before{content:"";flex:none;width:18px;height:18px;margin-top:4px;border-radius:50%;background:var(--royal) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") center/12px no-repeat}
+.cond{margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 22px;color:var(--ink-soft);font-size:.95rem}
+.cond b{color:var(--ink)}
+
+/* passos */
+.steps{position:relative;margin-top:56px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}
+.steps svg.line{position:absolute;left:0;top:28px;width:100%;height:8px;overflow:visible;pointer-events:none}
+.steps svg.line path{stroke:var(--gold);stroke-width:3;fill:none;stroke-dasharray:6 10}
+.step{position:relative}
+.step .dot{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:var(--navy2);border:2px solid var(--gold);color:var(--gold-hi);font:900 1.3rem var(--display);position:relative;z-index:1;box-shadow:0 0 0 8px var(--navy)}
+.step h3{margin-top:22px}
+.step p{color:var(--on-soft);margin-top:8px;font-size:.98rem}
+
+/* faq */
+.faqtop{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap}
+.search{position:relative;flex:1 1 320px;max-width:440px}
+.search input{width:100%;min-height:54px;padding:12px 18px 12px 50px;border-radius:999px;border:1px solid var(--line);background:var(--card);font:16px var(--body);color:var(--ink)}
+.search svg{position:absolute;left:18px;top:50%;width:20px;height:20px;transform:translateY(-50%);color:var(--ink-soft)}
+.faq{max-width:860px;margin-top:30px;display:grid;gap:10px}
+details{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:0 22px;transition:border-color .3s,box-shadow .3s}
+details[open]{border-color:#c5d0f2;box-shadow:0 18px 40px -26px rgba(10,21,80,.35)}
+summary{cursor:pointer;font:600 1.05rem var(--display);padding:18px 30px 18px 0;list-style:none;position:relative}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";position:absolute;right:0;top:50%;width:14px;height:14px;margin-top:-7px;background:linear-gradient(var(--royal),var(--royal)) center/14px 2px no-repeat,linear-gradient(var(--royal),var(--royal)) center/2px 14px no-repeat;transition:transform .3s}
+details[open] summary::after{transform:rotate(45deg)}
+details p{padding:0 0 20px;color:var(--ink-soft);max-width:65ch}
+.nores{display:none;padding:18px;color:var(--ink-soft)}
+mark{background:#FFF0B3;color:inherit;border-radius:3px;padding:0 2px}
+
+/* final */
+.final{text-align:center;overflow:hidden}
+.final .wrap{position:relative;z-index:1}
+.final .lead{margin-inline:auto}
+.final .btn{margin-top:32px}
+.final .rings{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.final .rings i{position:absolute;border:1px solid rgba(243,220,138,.18);border-radius:50%;animation:ring 6s linear infinite}
+@keyframes ring{from{width:120px;height:120px;opacity:1}to{width:1400px;height:1400px;opacity:0}}
+
+/* regulamento */
+body.is-lp #regulamento{display:none}
+body.is-reg main{display:none}
+.reg{padding-top:120px}
+.reg .back{font:600 1rem var(--display);color:var(--royal);text-decoration:none;display:inline-flex;min-height:44px;align-items:center;margin-bottom:20px}
+.reg h1{font-size:clamp(2rem,4vw,3rem);color:var(--ink)}
+.reg-body{max-width:760px;margin-top:12px}
+.reg-body h2{font-size:1.3rem;margin:40px 0 12px;padding-top:20px;border-top:1px solid var(--line)}
+.reg-body p,.reg-body li{color:var(--ink-soft)}
+.reg-body ul{margin:0;padding-left:22px;display:grid;gap:8px}
+.reg-body b{color:var(--ink)}
+
+footer{background:#020825;color:var(--on-soft);font-size:.86rem;padding:44px 0 56px}
+footer p{max-width:80ch;margin-top:10px}
+footer a{color:var(--on)}
+
+/* assistente */
+.fab{position:fixed;right:20px;bottom:20px;z-index:70;display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 20px 8px 8px;border-radius:999px;border:0;cursor:pointer;background:var(--navy);color:var(--on);font:700 .95rem var(--display);box-shadow:0 18px 40px -12px rgba(0,26,77,.6),0 0 0 1px rgba(243,220,138,.35)}
+.fab .orb{width:40px;height:40px;border-radius:50%;background:conic-gradient(from 0deg,var(--gold),#fff3c4,var(--vibe),var(--royal),var(--gold));animation:spin 4s linear infinite;position:relative}
+.fab .orb::after{content:"";position:absolute;inset:4px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#2a4bd8,var(--navy))}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chat{position:fixed;right:20px;bottom:88px;z-index:71;width:min(400px,calc(100vw - 24px));height:min(600px,calc(100svh - 120px));display:flex;flex-direction:column;border-radius:26px;background:rgba(6,18,80,.92);backdrop-filter:blur(20px) saturate(1.4);border:1px solid rgba(243,220,138,.25);color:var(--on);box-shadow:0 40px 90px -20px rgba(0,0,0,.6);transform-origin:100% 100%;transform:scale(.6) translateY(30px);opacity:0;pointer-events:none;transition:transform .45s cubic-bezier(.2,1.2,.3,1),opacity .3s}
+.chat.open{transform:none;opacity:1;pointer-events:auto}
+.chat-h{display:flex;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.chat-h .orb{width:34px;height:34px;flex:none}
+.chat-h b{font:700 1rem var(--display);display:block}
+.chat-h span{font-size:.8rem;color:var(--on-soft)}
+.chat-h button{margin-left:auto;width:44px;height:44px;border-radius:12px;border:0;background:rgba(255,255,255,.06);color:var(--on);cursor:pointer;font-size:1.2rem}
+.msgs{flex:1;overflow-y:auto;padding:18px;display:grid;gap:12px;align-content:start;overscroll-behavior:contain}
+.m{max-width:88%;padding:12px 15px;border-radius:18px;font-size:.95rem;line-height:1.5}
+.m.bot{background:rgba(255,255,255,.07);border-bottom-left-radius:6px}
+.m.me{justify-self:end;background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:var(--navy);border-bottom-right-radius:6px;font-weight:500}
+.m .src{display:block;margin-top:8px;font-size:.76rem;color:var(--gold)}
+.m .say{margin-top:8px;min-height:32px;padding:4px 12px;border-radius:999px;border:1px solid rgba(255,255,255,.2);background:none;color:var(--on-soft);font:600 .78rem var(--display);cursor:pointer}
+.typing{display:inline-flex;gap:5px}.typing i{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:bl 1s infinite}.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bl{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+.sugs{display:flex;gap:8px;overflow-x:auto;padding:0 18px 12px;scrollbar-width:none}
+.sugs button{flex:none;min-height:38px;padding:6px 14px;border-radius:999px;border:1px solid rgba(243,220,138,.35);background:none;color:var(--gold-hi);font:600 .82rem var(--display);cursor:pointer}
+.chat form{display:flex;gap:8px;padding:12px;border-top:1px solid rgba(255,255,255,.08)}
+.chat input{flex:1;min-height:48px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:var(--on);padding:0 18px;font:16px var(--body)}
+.chat input::placeholder{color:#9aa6d6}
+.chat form button{width:48px;height:48px;border-radius:50%;border:0;cursor:pointer;background:linear-gradient(180deg,var(--gold-hi),var(--gold));color:var(--navy);display:grid;place-items:center}
+
+/* cursor */
+.cur,.cur2{position:fixed;left:0;top:0;pointer-events:none;z-index:90;border-radius:50%;display:none}
+.cur{width:8px;height:8px;margin:-4px 0 0 -4px;background:var(--gold-hi)}
+.cur2{width:40px;height:40px;margin:-20px 0 0 -20px;border:1.5px solid rgba(215,187,90,.6);transition:width .25s,height .25s,margin .25s,background .25s}
+.cur2.big{width:70px;height:70px;margin:-35px 0 0 -35px;background:rgba(243,220,138,.12)}
+@media (pointer:fine){.cur,.cur2{display:block}}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:80;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+@media (max-width:1080px){nav{display:none}}
+@media (max-width:980px){
+  .grid4{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:40px}.steps svg.line{display:none}
+  .sim{grid-template-columns:minmax(0,1fr)}
+  nav{display:none}
+}
+@media (max-width:760px){
+  .flow,.split,.grid2,.vibe-head{grid-template-columns:minmax(0,1fr)}
+  .arrow{justify-self:center;transform:rotate(90deg)}
+  .hero{background:radial-gradient(ellipse 120% 70% at 50% 30%,#0C2FA8 0%,var(--navy) 70%)}
+  #gl{opacity:.9}
+  .hero::before{background:linear-gradient(180deg,rgba(0,26,77,0) 20%,rgba(0,26,77,.8) 48%,rgba(0,26,77,.92) 100%)}
+  .hero-txt{padding-top:36vh}
+}
+@media (max-width:520px){
+  .grid4,.steps,.checks{grid-template-columns:minmax(0,1fr)}
+  .breakdown{grid-template-columns:minmax(0,1fr)}
+  header .btn{display:none}
+  .fab span{display:none}.fab{padding:8px}
+  .hero-cta .btn{width:100%;justify-content:center}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .mrow{flex-wrap:wrap;width:auto}
+}
+</style>
+</head>
+<body class="is-lp">
+<div class="prog" id="prog"></div>
+<div class="grain" aria-hidden="true"></div>
+<div class="cur" id="cur" aria-hidden="true"></div><div class="cur2" id="cur2" aria-hidden="true"></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1B8"/><stop offset=".5" stop-color="#D7BB5A"/><stop offset="1" stop-color="#9C7A22"/></linearGradient>
+    <symbol id="coin" viewBox="0 0 40 40"><circle cx="20" cy="20" r="19" fill="url(#gGold)"/><circle cx="20" cy="20" r="14.5" fill="none" stroke="#7a5a12" stroke-opacity=".45" stroke-width="1.5"/><text x="20" y="27" text-anchor="middle" font-family="Poppins,Arial" font-weight="900" font-size="19" fill="#5c420a" fill-opacity=".8">B</text></symbol>
+  </defs>
+</svg>
+
+<header id="hdr">
+  <div class="wrap">
+    <a class="brand" href="#topo"><img src="img/logo.webp" width="640" height="202" alt="Baianão"><span class="tag">SÓCIO</span></a>
+    <nav aria-label="Seções">
+      <a href="#conta">A conta</a><a href="#vantagens">Vantagens</a><a href="#creditos-vibe">Créditos Vibe</a><a href="#simulador">Simulador</a><a href="#assistencias">Assistências</a><a href="#duvidas">Dúvidas</a>
+    </nav>
+    <a class="btn mag" href="#assinar">Quero ser sócio</a>
+  </div>
+</header>
+
+<main id="topo">
+
+<section class="hero" aria-labelledby="t-hero">
+  <div class="kv" aria-hidden="true"><i class="rays"></i><i class="r2"></i><i class="w1"></i><i class="r1"></i></div>
+  <div id="gl" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="hero-txt">
+      <p class="pill"><i>R$ 49,90/mês</i> O clube de vantagens do Baianão</p>
+      <h1 id="t-hero" class="splitw">Seja sócio e entre para <span class="gold">um mundo de vantagens</span></h1>
+      <p class="lead rv">100 Créditos Vibe todo mês, R$ 50 em compras no Baianão, 10% de cashback em móveis, colchões e estofados e assistência para a casa e para a família.</p>
+      <div class="hero-cta rv">
+        <a class="btn mag" href="#assinar">Quero ser sócio <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn-ghost mag" href="#simulador">Simular minha economia</a>
+      </div>
+      <div class="chips rv">
+        <div class="chip"><b>100</b><span>Créditos Vibe/mês</span></div>
+        <div class="chip"><b>R$ 50</b><span>no Baianão</span></div>
+        <div class="chip"><b>10%</b><span>de cashback</span></div>
+        <div class="chip"><b>24h</b><span>assistências</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="scrollhint" aria-hidden="true"></div>
+</section>
+
+<section class="conta" id="conta" aria-labelledby="t-conta">
+  <div class="stage"><div class="wrap" style="width:100%">
+    <p class="kick">A conta que fecha</p>
+    <h2 id="t-conta">A assinatura volta em compras</h2>
+    <div class="flow">
+      <div class="tile" id="tPay"><small>Você paga</small><strong>R$ 49,90</strong><span>de assinatura por mês</span></div>
+      <div class="arrow" aria-hidden="true"><svg viewBox="0 0 90 40"><path id="arw" d="M4 20 H82 M68 7 L84 20 L68 33"/></svg></div>
+      <div class="tile vibe-t" id="tGet"><small>Você recebe</small><div class="vrow"><span class="vibe-mark">vibe</span><strong><span data-count="100">100</span></strong></div><span>Créditos Vibe todo mês, no app</span></div>
+    </div>
+    <div class="split">
+      <div class="half" id="h1"><div class="ico">R$</div><div><b>50 créditos = R$ 50</b><span>em compras nas lojas físicas Baianão</span></div></div>
+      <div class="half v" id="h2"><div class="ico">250+</div><div><b>+ 50 créditos</b><span>para descontos em mais de 250 marcas</span></div></div>
+    </div>
+    <div class="bonus" id="bonus"><span>+ 10% de cashback</span><span>+ assistência funeral familiar</span><span>+ assistência residencial 24h</span></div>
+  </div></div>
+</section>
+
+<section class="band" id="vantagens">
+  <div class="wrap">
+    <p class="kick">O que você ganha</p>
+    <h2 class="rv">Quatro vantagens em uma assinatura</h2>
+    <div class="grid4">
+      <article class="card tilt rv"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5c0-1.2 1.3-2 3-2s3 .8 3 2-1.3 1.8-3 2.3-3 1.1-3 2.4 1.3 2.1 3 2.1 3-.9 3-2.1"/></svg></div><p class="big"><span data-count="100">100</span></p><h3>Créditos Vibe</h3><p>Todo mês, no app Créditos Vibe, para usar no Baianão e em mais de 250 marcas.</p></article>
+      <article class="card tilt rv"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18l-1.5 11h-15z"/><path d="M8 9V7a4 4 0 0 1 8 0v2"/></svg></div><p class="big">R$ <span data-count="50">50</span></p><h3>No Baianão</h3><p>Troque 50 créditos por R$ 50 em compras nas lojas físicas. Use no mês: o valor não acumula.</p></article>
+      <article class="card tilt rv"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5h-5"/><path d="M9 15l6-6M9.5 9.5h.01M14.5 14.5h.01"/></svg></div><p class="big"><span data-count="10">10</span>%</p><h3>De cashback</h3><p>Nas compras de móveis, colchões e estofados. Disponível 3 dias após a compra, por 30 dias.</p></article>
+      <article class="card tilt rv"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></div><p class="big"><span data-count="24">24</span>h</p><h3>Assistências</h3><p>Funeral familiar e residencial 24 horas, com chaveiro, eletricista, encanador e vidraceiro.</p></article>
+    </div>
+  </div>
+</section>
+
+<section class="band vibe" id="creditos-vibe">
+  <div class="wrap">
+    <div class="vibe-head">
+      <div>
+        <p class="kick">Créditos Vibe</p>
+        <p class="vlogo rv">vibe<em>O que são Créditos Vibe?</em></p>
+      </div>
+      <div class="rv">
+        <p class="lead" style="margin-top:0">É a moeda do app Créditos Vibe. Com ela você resgata descontos em mercado, farmácia, combustível, restaurantes, moda e beleza, sem mudar onde já compra.</p>
+        <p class="count250">+ de <span data-count="250">250</span> marcas parceiras</p>
+      </div>
+    </div>
+  </div>
+  <div class="marq" aria-label="Algumas marcas parceiras do Créditos Vibe">
+    <div class="mrow" id="m1"></div>
+    <div class="mrow rev" id="m2"></div>
+  </div>
+  <div class="wrap"><p class="fine" style="margin-top:28px">Como sócio você recebe 100 Créditos Vibe todo mês: 50 viram R$ 50 em compras no Baianão e os outros 50 valem nas marcas parceiras. Marcas e ofertas podem variar. Consulte as regras de uso no app.</p></div>
+</section>
+
+<section class="band" id="simulador">
+  <div class="wrap">
+    <p class="kick">Simulador</p>
+    <h2 class="rv">Quanto a assinatura devolve para você em um ano</h2>
+    <p class="lead rv">Mexa nos controles e veja, em tempo real, quanto volta em cupom e cashback comparado ao que você paga.</p>
+    <div class="sim">
+      <div class="panel rv">
+        <div class="field">
+          <label for="sMeses">Meses em que você usa o cupom de R$ 50 <output id="oMeses">12 meses</output></label>
+          <input type="range" id="sMeses" min="0" max="12" step="1" value="12">
+        </div>
+        <div class="field">
+          <label for="sGasto">Compras de móveis, colchões e estofados no ano <output id="oGasto">R$ 3.000</output></label>
+          <input type="range" id="sGasto" min="0" max="15000" step="250" value="3000">
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <p style="font:600 1rem var(--display);margin-bottom:12px">Exemplos rápidos</p>
+          <div class="presets" id="presets">
+            <button type="button" data-m="12" data-g="0" aria-pressed="false">Só o cupom</button>
+            <button type="button" data-m="12" data-g="3000" aria-pressed="true">Um colchão novo</button>
+            <button type="button" data-m="12" data-g="8000" aria-pressed="false">Mobiliar a sala</button>
+            <button type="button" data-m="6" data-g="1500" aria-pressed="false">Uso moderado</button>
+          </div>
+        </div>
+      </div>
+      <div class="result rv" aria-live="polite">
+        <small>Volta para você no ano</small>
+        <p class="num" id="rNum">R$ 900</p>
+        <p class="sub" id="rSub">R$ 301 a mais do que você paga</p>
+        <div class="bars">
+          <div class="bar c"><div class="lab"><span>Você paga (12 × R$ 49,90)</span><b>R$ 598,80</b></div><div class="tr"><div class="fl" id="bC"></div></div></div>
+          <div class="bar r"><div class="lab"><span>Volta em cupom + cashback</span><b id="rRet">R$ 900</b></div><div class="tr"><div class="fl" id="bR"></div></div></div>
+        </div>
+        <div class="breakdown">
+          <div><b id="rCup">R$ 600</b><span>em cupons no Baianão</span></div>
+          <div><b id="rCash">R$ 300</b><span>em cashback</span></div>
+          <div><b>+ 600</b><span>créditos para 250 marcas</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="fine">Simulação ilustrativa. O cupom é 1 por CPF por mês e não acumula. O cashback fica disponível 3 dias após a compra, vale por 30 dias e só em lojas físicas. As assistências e os créditos nas marcas parceiras não entram na conta.</p>
+  </div>
+</section>
+
+<section class="band" id="assistencias" style="padding-top:0">
+  <div class="wrap">
+    <p class="kick">Assistências</p>
+    <h2 class="rv">Proteção para a casa e para a família</h2>
+    <div class="grid2">
+      <div class="acard rv">
+        <svg class="art" viewBox="0 0 150 150" aria-hidden="true"><circle cx="75" cy="75" r="60" fill="#EEF2FF"/><path d="M75 40l30 12v22c0 17-12.7 30.6-30 34-17.3-3.4-30-17-30-34V52z" fill="#0A1D6E"/><path d="M62 75l9 9 17-19" stroke="#F3DC8A" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3>Assistência funeral familiar</h3>
+        <p style="color:var(--ink-soft);margin-top:8px;max-width:30ch">Plano individual ou familiar: cônjuge e filhos até 21 anos.</p>
+        <div class="facts"><div class="fact"><b>até R$ 5 mil</b><span>de cobertura</span></div><div class="fact"><b>titular + 3</b><span>dependentes</span></div></div>
+        <ul class="checks"><li>Sepultamento ou cremação</li><li>Translado</li><li>Locação de jazigo</li><li>Urna</li><li>Coroa de flores</li><li>Ornamentação de urna</li><li>Paramentos</li><li>Mesa de condolências</li><li>Velório</li><li>Registro do óbito</li><li>Carro funerário</li></ul>
+      </div>
+      <div class="acard rv">
+        <svg class="art" viewBox="0 0 150 150" aria-hidden="true"><circle cx="75" cy="75" r="60" fill="#EEF2FF"/><path d="M40 78l35-30 35 30v32H40z" fill="#0A1D6E"/><rect x="66" y="86" width="18" height="24" rx="3" fill="#F3DC8A"/><circle cx="100" cy="46" r="13" fill="#D7BB5A"/><path d="M95 46h10M100 41v10" stroke="#0A1D6E" stroke-width="3" stroke-linecap="round"/></svg>
+        <h3>Assistência residencial</h3>
+        <p style="color:var(--ink-soft);margin-top:8px;max-width:30ch">Ajuda profissional em casa quando você mais precisa.</p>
+        <div class="facts"><div class="fact"><b>2 eventos</b><span>a cada 12 meses, por serviço</span></div><div class="fact"><b>R$ 200</b><span>de limite por evento</span></div><div class="fact"><b>24/7</b><span>atendimento presencial</span></div></div>
+        <ul class="checks"><li>Chaveiro</li><li>Eletricista</li><li>Encanador</li><li>Vidraceiro</li></ul>
+      </div>
+    </div>
+    <div class="cond rv"><p><b>Carência:</b> 30 dias. <b>Onde vale:</b> Brasil, nas cidades com rede de prestadores. <b>Sem prestador na cidade:</b> a central orienta você, e o serviço pode ser reembolsado com nota fiscal e laudo, dentro dos limites de cobertura.</p></div>
+  </div>
+</section>
+
+<section class="band dark" id="como-funciona">
+  <div class="wrap">
+    <p class="kick">Como funciona</p>
+    <h2 class="rv">Quatro passos para ser sócio</h2>
+    <div class="steps" id="steps">
+      <svg class="line" viewBox="0 0 1000 8" preserveAspectRatio="none" aria-hidden="true"><path id="sline" d="M30 4 H970"/></svg>
+      <div class="step rv"><div class="dot">1</div><h3>Assine</h3><p>Cadastre seu cartão pelo WhatsApp ou em uma loja Baianão. São R$ 49,90 por mês, com cobrança recorrente.</p></div>
+      <div class="step rv"><div class="dot">2</div><h3>Receba</h3><p>Baixe o app Créditos Vibe e receba 100 créditos todo mês.</p></div>
+      <div class="step rv"><div class="dot">3</div><h3>Troque</h3><p>No app, troque 50 créditos por um cupom de R$ 50 para qualquer produto do Baianão.</p></div>
+      <div class="step rv"><div class="dot">4</div><h3>Use na loja</h3><p>Mostre o cupom digital do app Vibe ao vendedor na hora da compra, em uma loja física Baianão. Cupom e cashback não valem em compras online.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="duvidas">
+  <div class="wrap">
+    <div class="faqtop">
+      <div><p class="kick">Dúvidas frequentes</p><h2>Tudo o que você precisa saber</h2></div>
+      <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="fq" type="search" placeholder="Busque: cashback, cancelar, funeral…" aria-label="Buscar nas dúvidas"></div>
+    </div>
+    <div class="faq" id="faq">
+      <details><summary>Quanto custa ser Sócio Baianão?</summary><p>R$ 49,90 por mês. Você cadastra seu cartão uma vez e a cobrança é feita todo mês, de forma recorrente.</p></details>
+      <details><summary>O que eu recebo todo mês?</summary><p>100 Créditos Vibe, que incluem a troca de 50 créditos por R$ 50 em compras no Baianão, 10% de cashback nas compras de móveis, colchões e estofados e as assistências funeral familiar e residencial.</p></details>
+      <details><summary>Como consigo os R$ 50 em compras?</summary><p>No app Vibe, você troca 50 Créditos Vibe por um cupom digital de R$ 50. Ele vale para qualquer produto nas lojas físicas Baianão. É 1 cupom por CPF por mês, e o valor não acumula para o mês seguinte.</p></details>
+      <details><summary>Como uso o cupom na loja?</summary><p>Mostre o cupom do app ao vendedor no momento da compra. A loja valida o cupom no caixa e, depois disso, ele não pode ser usado de novo.</p></details>
+      <details><summary>Quando começo a usar os benefícios?</summary><p>Logo após a confirmação do pagamento da assinatura. Os 100 Créditos Vibe entram na sua conta do app, e as assistências têm carência de 30 dias.</p></details>
+      <details><summary>Como funciona o cashback?</summary><p>Quando você compra móveis, colchões ou estofados no Baianão, 10% do valor volta para você. O cashback fica disponível 3 dias após a compra e vale por 30 dias.</p></details>
+      <details><summary>Posso usar meu cupom e meu cashback no site?</summary><p>Não. O cupom e o cashback só podem ser usados em lojas físicas Baianão.</p></details>
+      <details><summary>O que são e onde uso os Créditos Vibe?</summary><p>São a moeda do app Créditos Vibe. Você troca por descontos em mais de 250 marcas parceiras. As marcas e ofertas podem variar; consulte as regras de uso no app.</p></details>
+      <details><summary>Quem está coberto pela assistência funeral?</summary><p>O titular e até 3 dependentes: cônjuge e filhos até 21 anos, com cobertura de até R$ 5 mil.</p></details>
+      <details><summary>O que a assistência residencial cobre?</summary><p>Chaveiro, eletricista, encanador e vidraceiro, com atendimento presencial 24 horas. São 2 eventos a cada 12 meses por serviço, com limite de R$ 200 por evento.</p></details>
+      <details><summary>As assistências têm carência?</summary><p>Sim, de 30 dias.</p></details>
+      <details><summary>Como cancelo a assinatura?</summary><p>Você pode cancelar a renovação automática a qualquer momento: a assinatura segue ativa até o fim do período já pago, sem novas cobranças. <span class="ph">canal para pedir o cancelamento</span></p></details>
+      <details><summary>Posso desistir e receber o dinheiro de volta?</summary><p>Sim, em até 7 dias corridos após a contratação, desde que você não tenha usado nenhum benefício do clube, como Créditos Vibe ou assistências. Se algum benefício tiver sido usado, o reembolso pode ser recusado.</p></details>
+      <p class="nores" id="nores">Nada encontrado. Pergunte ao assistente no canto da tela.</p>
+    </div>
+    <p class="fine" style="margin-top:22px"><a href="#regulamento">Leia o regulamento completo do clube</a></p>
+  </div>
+</section>
+
+<section class="band dark final" id="assinar">
+  <div class="rings" aria-hidden="true"><i></i><i style="animation-delay:-2s"></i><i style="animation-delay:-4s"></i></div>
+  <div class="wrap">
+    <img class="rv" src="img/logo.webp" width="640" height="202" alt="Baianão" style="width:min(420px,80vw);height:auto;margin:0 auto 28px;filter:drop-shadow(0 20px 40px rgba(0,0,0,.45))">
+    <p class="kick" style="justify-content:center">Seja Sócio Baianão</p>
+    <h2 class="rv">Entre para um mundo de vantagens</h2>
+    <p class="lead rv">Chame no WhatsApp ou fale com um vendedor em qualquer loja Baianão.</p>
+    <a class="btn mag wa" href="#assinar"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.3 14.1c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.6-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8s.7-2 1-2.3c.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.4.4c-.1.1-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.2.5.1.6 0l.9-1c.2-.3.4-.2.6-.1l1.9.9c.3.1.5.2.5.3.1.1.1.6-.1 1.1z"/></svg>Quero ser sócio pelo WhatsApp</a>
+    <p class="fine waph"><span class="ph">número do WhatsApp para os botões</span></p>
+  </div>
+</section>
+
+</main>
+
+<section class="band reg" id="regulamento">
+  <div class="wrap">
+    <p><a class="back" href="#topo">← Voltar para a página do clube</a></p>
+    <p class="kick">Regulamento</p>
+    <h1>Regulamento do Sócio Baianão</h1>
+    <p class="lead">Regras de adesão, uso dos benefícios e cancelamento do clube de vantagens do Baianão.</p>
+    <div class="reg-body">
+      <h2>1. Sobre o clube</h2>
+      <p>O Sócio Baianão é o clube de vantagens do Baianão Móveis e Eletro, vendido em todas as lojas da rede por assinatura recorrente de R$ 49,90 por mês. O clube reúne Créditos Vibe, cupom de desconto para compras no Baianão, cashback e assistências.</p>
+      <h2>2. Adesão e pagamento</h2>
+      <ul><li>A adesão é feita com o cadastro de um cartão, e a cobrança de R$ 49,90 se repete todo mês.</li><li>Os benefícios ficam disponíveis logo após a confirmação do pagamento da assinatura.</li></ul>
+      <h2>3. Créditos Vibe</h2>
+      <ul><li>A cada pagamento confirmado, o sócio recebe 100 Créditos Vibe na sua conta do app Créditos Vibe.</li><li>Os créditos podem ser trocados por descontos nas marcas parceiras do Vibe. Marcas e ofertas podem variar; as regras de uso estão no app.</li></ul>
+      <h2>4. Cupom de R$ 50 para compras no Baianão</h2>
+      <ul><li>O sócio pode trocar 50 Créditos Vibe por um cupom de desconto de R$ 50,00.</li><li>O cupom é digital, gerado e disponibilizado no app Vibe.</li><li>Vale para a compra de qualquer produto nas lojas físicas Baianão. Não vale para compras online.</li><li>Limite de 1 cupom por CPF por mês. O valor não acumula para o mês seguinte.</li><li>O sócio apresenta o cupom no momento da compra, e a loja valida o cupom no caixa.</li><li>Depois de validado, o cupom é considerado utilizado e não pode ser usado de novo.</li></ul>
+      <h2>5. Cashback</h2>
+      <ul><li>O sócio recebe 10% de cashback nas compras de móveis, colchões e estofados.</li><li>O cashback fica disponível 3 dias após a compra e vale por 30 dias.</li><li>O cashback só pode ser usado em lojas físicas Baianão.</li></ul>
+      <h2>6. Assistências</h2>
+      <ul><li><b>Assistência funeral familiar:</b> até R$ 5 mil de cobertura para o titular e até 3 dependentes (cônjuge e filhos até 21 anos). Inclui sepultamento ou cremação, translado, locação de jazigo, urna, coroa de flores, ornamentação de urna, paramentos, mesa de condolências, velório, registro do óbito e carro funerário.</li><li><b>Assistência residencial:</b> chaveiro, eletricista, encanador e vidraceiro, com atendimento presencial 24 horas. São 2 eventos a cada 12 meses por serviço, com limite de R$ 200 por evento.</li><li><b>Carência:</b> 30 dias.</li><li><b>Onde vale:</b> Brasil, nas cidades com rede de prestadores. Sem prestador na cidade, a central orienta o sócio, e o serviço pode ser reembolsado com nota fiscal e laudo, dentro dos limites de cobertura.</li></ul>
+      <h2>7. Cancelamento</h2>
+      <ul><li><b>Direito de arrependimento:</b> o sócio pode cancelar a assinatura em até 7 dias corridos após a contratação, conforme o Código de Defesa do Consumidor.</li><li>Para o cancelamento com reembolso, o sócio não pode ter usado nenhum benefício do clube. Conta como uso: utilizar Créditos Vibe, acionar qualquer assistência ou usar qualquer outro benefício da assinatura. Se algum benefício tiver sido usado, o reembolso pode ser recusado.</li><li><b>Cancelamento da renovação:</b> o sócio pode cancelar a renovação automática a qualquer momento. A assinatura segue ativa até o fim do período já pago, sem novas cobranças.</li></ul>
+      <h2>8. Informações gerais</h2>
+      <ul><li>Créditos Vibe é uma plataforma da VERTEM Soluções de Engajamento Ltda.</li><li>O clube é oferecido por Baianao Moveis, Eletrodomicos e Corretora de Cambio Ltda., CNPJ 36.213.646/0001-02, Rodovia BR 324, s/n, Cia Sul, Simões Filho, BA.</li><li>Atendimento: <span class="ph">WhatsApp e canais de atendimento</span></li></ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <a class="brand" href="#topo"><img src="img/logo.webp" width="640" height="202" alt="Baianão"><span class="tag">SÓCIO</span></a>
+    <p>Baianao Moveis, Eletrodomicos e Corretora de Cambio Ltda. CNPJ 36.213.646/0001-02. Rodovia BR 324, s/n, Cia Sul, Simões Filho, BA, CEP 43700-000.</p>
+    <p>Créditos Vibe é uma plataforma da VERTEM Soluções de Engajamento Ltda. Marcas parceiras e ofertas podem variar conforme a disponibilidade. As assistências têm carência de 30 dias e limites de cobertura. <a href="#regulamento">Leia o regulamento do clube</a>.</p>
+  </div>
+</footer>
+
+<button class="fab" id="fab" aria-expanded="false" aria-controls="chat"><i class="orb" aria-hidden="true"></i><span>Tire sua dúvida</span></button>
+<div class="chat" id="chat" role="dialog" aria-label="Assistente Sócio Baianão">
+  <div class="chat-h"><i class="orb fab-orb" aria-hidden="true" style="border-radius:50%;background:conic-gradient(from 0deg,#D7BB5A,#fff3c4,#665FFF,#2A4BD8,#D7BB5A);animation:spin 4s linear infinite"></i><div><b>Assistente Sócio Baianão</b><span>Responde na hora, com base no regulamento</span></div><button id="xchat" aria-label="Fechar">×</button></div>
+  <div class="msgs" id="msgs"></div>
+  <div class="sugs" id="sugs"></div>
+  <form id="cf"><input id="ci" autocomplete="off" placeholder="Pergunte qualquer coisa sobre o clube" aria-label="Sua pergunta"><button aria-label="Enviar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></form>
+</div>
+
+<script type="module">
+/* WebGL: logo 3D do Baianão + moedas de ouro com o logo */
+const host=document.getElementById('gl');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+try{
+  const THREE=await import('three');
+  const {RoomEnvironment}=await import('three/addons/environments/RoomEnvironment.js');
+  const {EffectComposer}=await import('three/addons/postprocessing/EffectComposer.js');
+  const {RenderPass}=await import('three/addons/postprocessing/RenderPass.js');
+  const {UnrealBloomPass}=await import('three/addons/postprocessing/UnrealBloomPass.js');
+  const {OutputPass}=await import('three/addons/postprocessing/OutputPass.js');
+  const logo=new Image();logo.src='img/logo.webp';await logo.decode();await document.fonts.ready;
+  const LW=logo.naturalWidth,LH=logo.naturalHeight;
+  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,1.75));
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1;
+  renderer.setClearColor(0x000000,0);host.appendChild(renderer.domElement);
+  const scene=new THREE.Scene();
+  {const bc=document.createElement('canvas');bc.width=bc.height=1024;const bg=bc.getContext('2d');const wide=innerWidth>760;const gx=wide?720:512,gy=wide?430:300;const rg=bg.createRadialGradient(gx,gy,0,gx,gy,760);rg.addColorStop(0,'#1f72ff');rg.addColorStop(.28,'#0050d0');rg.addColorStop(.55,'#00388A');rg.addColorStop(1,'#001A4D');bg.fillStyle=rg;bg.fillRect(0,0,1024,1024);const bt=new THREE.CanvasTexture(bc);bt.colorSpace=THREE.SRGBColorSpace;scene.background=bt;}
+  const pm=new THREE.PMREMGenerator(renderer);scene.environment=pm.fromScene(new RoomEnvironment(),0.04).texture;
+  const cam=new THREE.PerspectiveCamera(35,1,.1,100);cam.position.set(0,0,15);
+  const aniso=renderer.capabilities.getMaxAnisotropy();
+  const tex=c=>{const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=aniso;return t};
+
+  /* ---- logo 3D ---- */
+  const U=100; // px por unidade
+  const lc=document.createElement('canvas');lc.width=LW*2;lc.height=LH*2;const lg=lc.getContext('2d');lg.imageSmoothingQuality='high';lg.drawImage(logo,0,0,lc.width,lc.height);
+  const logoTex=tex(lc);
+  // letras brancas isoladas (para dar relevo)
+  const wc=document.createElement('canvas');wc.width=lc.width;wc.height=lc.height;const wg=wc.getContext('2d');wg.drawImage(lc,0,0);
+  const id=wg.getImageData(0,0,wc.width,wc.height),d=id.data;
+  for(let i=0;i<d.length;i+=4){const m=Math.min(d[i],d[i+1],d[i+2]);const a=Math.max(0,Math.min(1,(m-120)/110))*(d[i+3]/255);d[i]=d[i+1]=d[i+2]=255;d[i+3]=a*255}
+  wg.putImageData(id,0,0);const whiteTex=tex(wc);
+  const pill=(w,h,r)=>{const s=new THREE.Shape(),x=-w/2,y=-h/2;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);return s};
+  const shear=new THREE.Matrix4().set(1,.23,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
+  const body=(color,depth)=>{const g=new THREE.ExtrudeGeometry(pill(5.95,1.72,.62),{depth,bevelEnabled:true,bevelThickness:.08,bevelSize:.06,bevelSegments:6,curveSegments:24});g.applyMatrix4(shear);g.translate(0,0,-depth-.08);
+    return new THREE.Mesh(g,new THREE.MeshPhysicalMaterial({color,roughness:.28,metalness:.15,clearcoat:1,clearcoatRoughness:.12}))};
+  const L=new THREE.Group();
+  const blue=body(0x0046B0,.55);blue.position.set(.02,.125,-.005);L.add(blue);
+  const red=body(0xF7040F,.55);red.position.set(-.1,-.12,-.2);L.add(red);
+  const face=new THREE.Mesh(new THREE.PlaneGeometry(LW/U,LH/U),new THREE.MeshPhysicalMaterial({map:logoTex,transparent:true,alphaTest:.5,roughness:.3,clearcoat:1,clearcoatRoughness:.1}));face.position.z=.002;L.add(face);
+  const lettersM=[];for(let k=1;k<=6;k++){const m=new THREE.MeshStandardMaterial({map:whiteTex,transparent:true,alphaTest:.5,color:k===6?0xffffff:new THREE.Color().setHSL(.61,.3,.62+k*.04),roughness:.4,metalness:0});
+    const pl=new THREE.Mesh(new THREE.PlaneGeometry(LW/U,LH/U),m);pl.position.z=.004+k*.013;L.add(pl);lettersM.push(m)}
+  scene.add(L);
+
+  /* ---- moedas com o logo ---- */
+  const fc=document.createElement('canvas');fc.width=fc.height=512;const g=fc.getContext('2d');
+  const gr=g.createRadialGradient(200,170,30,256,256,280);gr.addColorStop(0,'#FFF4C8');gr.addColorStop(.5,'#E6C866');gr.addColorStop(1,'#8E6E1C');
+  g.fillStyle=gr;g.fillRect(0,0,512,512);
+  g.strokeStyle='rgba(92,62,6,.5)';g.lineWidth=16;g.beginPath();g.arc(256,256,224,0,7);g.stroke();
+  g.lineWidth=4;g.beginPath();g.arc(256,256,196,0,7);g.stroke();
+  for(let i=0;i<72;i++){const a=i/72*Math.PI*2;g.save();g.translate(256+Math.cos(a)*240,256+Math.sin(a)*240);g.rotate(a);g.fillStyle='rgba(92,62,6,.35)';g.fillRect(-2,-7,4,14);g.restore()}
+  const lw=330,lh=lw*LH/LW;g.shadowColor='rgba(60,40,0,.45)';g.shadowBlur=14;g.shadowOffsetY=6;g.drawImage(logo,256-lw/2,262-lh/2,lw,lh);g.shadowColor='transparent';
+  g.fillStyle='rgba(78,52,4,.82)';g.textAlign='center';g.textBaseline='middle';g.font='800 44px Poppins, Arial';g.fillText('SÓCIO',256,140);
+  g.font='700 30px Poppins, Arial';g.fillText('★  100 CRÉDITOS  ★',256,382);
+  const coinFace=tex(fc);
+  const cg=new THREE.CylinderGeometry(1,1,.16,72,1);cg.rotateX(Math.PI/2);
+  const mats=[new THREE.MeshStandardMaterial({color:0xD7BB5A,metalness:1,roughness:.3}),new THREE.MeshStandardMaterial({map:coinFace,metalness:.85,roughness:.28}),new THREE.MeshStandardMaterial({map:coinFace,metalness:.85,roughness:.28})];
+  const small=innerWidth<760;const N=small?34:80;
+  const inst=new THREE.InstancedMesh(cg,mats,N);inst.instanceMatrix.setUsage(THREE.DynamicDrawUsage);scene.add(inst);
+  const P=[];for(let i=0;i<N;i++)P.push({r:(small?2.6:3.6)+Math.random()*(small?2.6:4.4),a:Math.random()*6.28,y:(Math.random()-.5)*14,sp:(.15+Math.random()*.25)*(Math.random()<.5?1:-1),f:.3+Math.random()*.6,s:(small?.22:.3)+Math.random()*.38,rx:Math.random()*6,ry:Math.random()*6,vx:.4+Math.random()*1.4,vy:.3+Math.random()*1.2,b:Math.random()});
+
+  const key=new THREE.DirectionalLight(0xffffff,3);key.position.set(3,6,9);scene.add(key);
+  const rim=new THREE.DirectionalLight(0xff3040,2);rim.position.set(-7,-3,-3);scene.add(rim);
+  const rim2=new THREE.DirectionalLight(0x5aa0ff,3);rim2.position.set(7,4,-4);scene.add(rim2);
+  scene.add(new THREE.AmbientLight(0x3050a0,.5));
+  const comp=new EffectComposer(renderer);comp.addPass(new RenderPass(scene,cam));
+  const bloom=new UnrealBloomPass(new THREE.Vector2(1,1),.22,.4,1.05);comp.addPass(bloom);comp.addPass(new OutputPass());
+  let cx=0,cy=0,ls=1;
+  function size(){const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h,false);comp.setSize(w,h);cam.aspect=w/h;cam.updateProjectionMatrix();
+    const wide=w>760;cx=wide?Math.min(5.4,(w/h)*2.75):0;cy=wide?.2:3.1;
+    const visW=2*Math.tan(cam.fov*Math.PI/360)*15*cam.aspect;ls=wide?Math.min(.95,visW*.33/6.4):Math.min(.95,visW*.86/6.4)}
+  const ro=new ResizeObserver(size);ro.observe(host);size();
+  let mx=0,my=0,tx=0,ty=0;
+  addEventListener('pointermove',e=>{mx=e.clientX/innerWidth-.5;my=e.clientY/innerHeight-.5},{passive:true});
+  let vis=true;new IntersectionObserver(([e])=>{vis=e.isIntersecting}).observe(host);
+  const m=new THREE.Matrix4(),q=new THREE.Quaternion(),eu=new THREE.Euler(),v=new THREE.Vector3(),sc=new THREE.Vector3();
+  const clock=new THREE.Clock();let T=0;const INTRO=reduce?0:2.2;
+  const easeOutBack=x=>{const c1=1.5,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2)};
+  const easeOut=x=>1-Math.pow(1-x,4);
+  function frame(){
+    requestAnimationFrame(frame);if(!vis)return;
+    const dt=Math.min(clock.getDelta(),.05);T+=dt;const mt=reduce?0:T;
+    tx+=(mx-tx)*.06;ty+=(my-ty)*.06;
+    const sy=scrollY/innerHeight;
+    cam.position.set(tx*1.2,-ty*.9-sy*1.4,15+sy*3);cam.lookAt(cx*.3,cy*.25-sy*1.4,0);
+    /* logo: entrada girando + flutuação + segue o mouse */
+    const k=INTRO?Math.min(1,T/INTRO):1;
+    const s=ls*easeOutBack(Math.min(1,k*1.15));
+    L.scale.setScalar(Math.max(.001,s));
+    L.position.set(cx,cy+Math.sin(mt*1.1)*.12+(1-easeOut(k))*-3,0);
+    L.rotation.set(-ty*.45+Math.sin(mt*.8)*.05+sy*.4,(1-easeOut(k))*Math.PI*2.5+tx*.9+Math.sin(mt*.5)*.12,(1-easeOut(k))*-.4+Math.sin(mt*.6)*.03);
+    /* moedas: explodem do logo e entram em órbita */
+    const burst=easeOut(Math.min(1,T/(INTRO+.6||1)));
+    for(let i=0;i<N;i++){const p=P[i];p.a+=p.sp*dt*(reduce?0:1);p.y-=p.f*dt*(reduce?0:1);if(p.y<-8)p.y=8;
+      const r=p.r*(.15+.85*burst);
+      v.set(cx+Math.cos(p.a)*r,cy+p.y*burst,Math.sin(p.a)*r*.45-2.6);
+      eu.set(p.rx+mt*p.vx,p.ry+mt*p.vy,0);q.setFromEuler(eu);sc.setScalar(p.s*Math.min(1,burst*1.4));m.compose(v,q,sc);inst.setMatrixAt(i,m)}
+    inst.instanceMatrix.needsUpdate=true;
+    comp.render();
+  }
+  frame();
+}catch(err){console.warn(err);host.classList.add('nogl')}
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+{
+const WHATSAPP=''; // ex.: '5571999999999' — preencha para ligar todos os botões de assinatura
+const REDUCE=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const FINE=matchMedia('(pointer:fine)').matches;
+const hasG=!!window.gsap;
+if(hasG&&window.ScrollTrigger)gsap.registerPlugin(ScrollTrigger);
+const brl=v=>'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:v%1?2:0,maximumFractionDigits:2});
+
+/* WhatsApp */
+if(WHATSAPP){const u='https://wa.me/'+WHATSAPP+'?text='+encodeURIComponent('Olá! Quero ser Sócio Baianão.');document.querySelectorAll('.wa').forEach(a=>{a.href=u;a.target='_blank';a.rel='noopener'});document.querySelectorAll('.waph').forEach(p=>p.remove())}
+
+/* marcas */
+const brands=['Cacau Show','Natura','Drogasil','O Boticário','Cinemark','Petz','Burger King','Netshoes','Uber','Renner','Assaí','Domino’s','Outback','Globoplay'];
+const row=a=>{const h=a.map(b=>'<span class="brandchip">'+b+'</span>').join('');return h+h};
+document.getElementById('m1').innerHTML=row(brands);
+document.getElementById('m2').innerHTML=row(brands.slice(7).concat(brands.slice(0,7)));
+
+/* rolagem suave */
+let lenis=null;
+if(window.Lenis&&!REDUCE){lenis=new Lenis({lerp:.1,smoothWheel:true});
+  if(hasG&&window.ScrollTrigger){lenis.on('scroll',ScrollTrigger.update);gsap.ticker.add(t=>lenis.raf(t*1000));gsap.ticker.lagSmoothing(0)}
+  else{const r=t=>{lenis.raf(t);requestAnimationFrame(r)};requestAnimationFrame(r)}}
+
+/* rotas: página e regulamento */
+function route(){
+  const reg=location.hash==='#regulamento';
+  const apply=()=>{document.body.classList.toggle('is-reg',reg);document.body.classList.toggle('is-lp',!reg);
+    if(reg){lenis?lenis.scrollTo(0,{immediate:true}):scrollTo(0,0);return}
+    const el=location.hash.length>1?document.getElementById(location.hash.slice(1)):null;
+    if(el)lenis?lenis.scrollTo(el,{offset:-70}):el.scrollIntoView();
+    if(window.ScrollTrigger)setTimeout(()=>ScrollTrigger.refresh(),50)};
+  const was=document.body.classList.contains('is-reg');
+  if(was!==reg&&document.startViewTransition)document.startViewTransition(apply);else apply();
+}
+addEventListener('hashchange',route);route();
+document.addEventListener('click',e=>{const a=e.target.closest('a[href^="#"]');if(!a||!lenis)return;const id=a.getAttribute('href');
+  if(id==='#regulamento'||document.body.classList.contains('is-reg'))return;
+  const el=id.length>1&&document.getElementById(id.slice(1));if(el){e.preventDefault();lenis.scrollTo(el,{offset:-70});history.replaceState(null,'',id)}});
+
+/* header + progresso */
+const hdr=document.getElementById('hdr'),prog=document.getElementById('prog');
+const onS=()=>{const y=scrollY;hdr.classList.toggle('solid',y>40);const h=document.documentElement.scrollHeight-innerHeight;prog.style.transform='scaleX('+(h>0?y/h:0)+')'};
+addEventListener('scroll',onS,{passive:true});onS();
+
+/* contadores */
+const counters=[...document.querySelectorAll('[data-count]')];
+const runCount=el=>{const end=+el.dataset.count;if(REDUCE||!hasG){el.textContent=end;return}const o={v:0};gsap.to(o,{v:end,duration:1.6,ease:'power3.out',onUpdate:()=>el.textContent=Math.round(o.v)})};
+const cio=new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){runCount(x.target);cio.unobserve(x.target)}}),{threshold:.6});
+counters.forEach(c=>cio.observe(c));
+
+if(hasG&&!REDUCE){
+  /* título palavra por palavra */
+  const h1=document.querySelector('.splitw');
+  const wrapWords=node=>{[...node.childNodes].forEach(n=>{if(n.nodeType===3){const f=document.createDocumentFragment();n.textContent.split(/(\s+)/).forEach(w=>{if(!w)return;if(/^\s+$/.test(w)){f.append(w);return}const o=document.createElement('span');o.className='w';const i=document.createElement('span');i.textContent=w;o.append(i);f.append(o)});n.replaceWith(f)}else if(n.nodeType===1)wrapWords(n)})};
+  wrapWords(h1);
+  gsap.from('.hero .w>span',{yPercent:110,rotate:4,duration:1.1,ease:'expo.out',stagger:.06,delay:.15});
+  gsap.from('.hero .pill',{y:20,opacity:0,duration:.8,ease:'power3.out'});
+  gsap.from('.hero .rv',{y:30,opacity:0,duration:1,ease:'power3.out',stagger:.12,delay:.55});
+  gsap.from('.hero .chip',{y:20,opacity:0,scale:.9,duration:.7,ease:'back.out(2)',stagger:.08,delay:.9});
+
+  /* entradas no scroll */
+  document.querySelectorAll('main .rv:not(.hero .rv)').forEach(el=>gsap.from(el,{y:50,opacity:0,duration:1,ease:'power3.out',scrollTrigger:{trigger:el,start:'top 88%'}}));
+
+  /* conta fixada no scroll */
+  const mm=gsap.matchMedia();
+  mm.add('(min-width:761px)',()=>{
+    const arw=document.getElementById('arw');const L=arw.getTotalLength();arw.style.strokeDasharray=L;arw.style.strokeDashoffset=L;
+    const tl=gsap.timeline({scrollTrigger:{trigger:'#conta',start:'top top',end:'+=160%',scrub:.8,pin:'#conta .stage',anticipatePin:1}});
+    tl.from('#tPay',{x:-80,opacity:0,duration:1})
+      .to(arw,{strokeDashoffset:0,duration:.8})
+      .from('#tGet',{x:80,opacity:0,scale:.9,rotateY:-25,duration:1},'<.2')
+      .from('#h1',{y:60,opacity:0,duration:.8})
+      .from('#h2',{y:60,opacity:0,duration:.8},'<.15')
+      .from('#bonus span',{y:20,opacity:0,stagger:.15,duration:.5});
+  });
+  mm.add('(max-width:760px)',()=>{gsap.from('#conta .tile,#conta .half,#bonus',{y:40,opacity:0,stagger:.12,duration:.8,scrollTrigger:{trigger:'#conta',start:'top 70%'}})});
+
+  /* linha dos passos */
+  const sl=document.getElementById('sline');
+  gsap.fromTo(sl,{strokeDashoffset:1000},{strokeDashoffset:0,ease:'none',scrollTrigger:{trigger:'#steps',start:'top 80%',end:'top 35%',scrub:true}});
+  gsap.from('.step .dot',{scale:0,duration:.6,ease:'back.out(2.5)',stagger:.15,scrollTrigger:{trigger:'#steps',start:'top 75%'}});
+
+  /* ímã nos botões */
+  if(FINE)document.querySelectorAll('.mag').forEach(b=>{const xT=gsap.quickTo(b,'x',{duration:.4,ease:'power3'}),yT=gsap.quickTo(b,'y',{duration:.4,ease:'power3'});
+    b.addEventListener('pointermove',e=>{const r=b.getBoundingClientRect();xT((e.clientX-r.left-r.width/2)*.3);yT((e.clientY-r.top-r.height/2)*.4)});
+    b.addEventListener('pointerleave',()=>{xT(0);yT(0)})});
+}
+
+/* cards 3D com luz */
+if(FINE&&!REDUCE)document.querySelectorAll('.tilt').forEach(c=>{
+  c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width,y=(e.clientY-r.top)/r.height;
+    c.style.setProperty('--mx',x*100+'%');c.style.setProperty('--my',y*100+'%');
+    c.style.transform='perspective(900px) rotateX('+((.5-y)*10)+'deg) rotateY('+((x-.5)*12)+'deg) translateZ(0)'});
+  c.addEventListener('pointerleave',()=>{c.style.transition='transform .6s cubic-bezier(.2,.8,.2,1),box-shadow .3s';c.style.transform='';setTimeout(()=>c.style.transition='',600)})});
+
+/* cursor */
+if(FINE&&!REDUCE){const c1=document.getElementById('cur'),c2=document.getElementById('cur2');let x=-99,y=-99,x2=-99,y2=-99;
+  addEventListener('pointermove',e=>{x=e.clientX;y=e.clientY;c1.style.transform='translate('+x+'px,'+y+'px)'},{passive:true});
+  const loop=()=>{x2+=(x-x2)*.16;y2+=(y-y2)*.16;c2.style.transform='translate('+x2+'px,'+y2+'px)';requestAnimationFrame(loop)};loop();
+  document.addEventListener('pointerover',e=>c2.classList.toggle('big',!!e.target.closest('a,button,summary,input,.tilt')))}
+else{document.getElementById('cur').remove();document.getElementById('cur2').remove()}
+
+/* simulador */
+const sM=document.getElementById('sMeses'),sG=document.getElementById('sGasto');
+const out={meses:document.getElementById('oMeses'),gasto:document.getElementById('oGasto'),num:document.getElementById('rNum'),sub:document.getElementById('rSub'),ret:document.getElementById('rRet'),cup:document.getElementById('rCup'),cash:document.getElementById('rCash'),bC:document.getElementById('bC'),bR:document.getElementById('bR')};
+const COST=12*49.90;let shown=0;
+function sim(fromPreset){
+  const m=+sM.value,g=+sG.value;
+  [sM,sG].forEach(s=>s.style.setProperty('--p',((s.value-s.min)/(s.max-s.min)*100)+'%'));
+  out.meses.textContent=m+(m===1?' mês':' meses');out.gasto.textContent=brl(g);
+  const cup=m*50,cash=g*.10,ret=cup+cash,diff=ret-COST;
+  out.cup.textContent=brl(cup);out.cash.textContent=brl(Math.round(cash));out.ret.textContent=brl(Math.round(ret));
+  out.sub.textContent=diff>=0?brl(Math.round(diff))+' a mais do que você paga':'Faltam '+brl(Math.round(-diff))+' para cobrir a assinatura com cupom e cashback';
+  const max=Math.max(COST,ret,1);out.bC.style.width=(COST/max*100)+'%';out.bR.style.width=(ret/max*100)+'%';
+  if(hasG&&!REDUCE){const o={v:shown};gsap.to(o,{v:ret,duration:.6,ease:'power2.out',overwrite:true,onUpdate:()=>{out.num.textContent=brl(Math.round(o.v))}})}else out.num.textContent=brl(Math.round(ret));
+  shown=ret;
+  if(!fromPreset)document.querySelectorAll('#presets button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.m===m&&+b.dataset.g===g)));
+}
+[sM,sG].forEach(s=>s.addEventListener('input',()=>sim(false)));
+document.getElementById('presets').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;sM.value=b.dataset.m;sG.value=b.dataset.g;
+  document.querySelectorAll('#presets button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));sim(true)});
+sim(true);
+
+/* base de conhecimento: FAQ + regulamento da própria página */
+const norm=s=>s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const STOP=new Set('a o as os de da do das dos e em no na nos nas um uma uns umas para pra por com que qual quais quanto quantos como eu meu minha meus minhas voce se ser sou ao aos ou mais tem ter ja isso esse essa este esta onde quando pode posso e é ha sim nao the'.split(' '));
+const SYN={preco:['custa','49','mensalidade','valor'],valor:['custa','49'],mensalidade:['custa','cobranca'],pagar:['cartao','cobranca','custa'],pago:['cartao','cobranca'],cancelar:['cancelamento','cancelo','renovacao'],cancelamento:['cancelo','renovacao'],sair:['cancelo','cancelamento'],desistir:['arrependimento','reembolso','volta'],devolucao:['reembolso','arrependimento'],reembolso:['arrependimento','desistir'],enterro:['funeral','sepultamento'],morte:['funeral','obito'],falecimento:['funeral','obito'],funeral:['funeral'],chaveiro:['residencial'],encanador:['residencial'],eletricista:['residencial'],vidraceiro:['residencial'],casa:['residencial'],dependente:['conjuge','filhos'],esposa:['conjuge'],marido:['conjuge'],filho:['filhos'],online:['site','online'],internet:['site','online'],site:['online'],app:['aplicativo','vibe'],credito:['creditos','vibe'],marca:['marcas','parceiras'],loja:['lojas','fisicas'],desconto:['cupom','descontos'],cupom:['cupom'],cashback:['cashback'],carencia:['carencia','30'],comecar:['quando','confirmacao'],acumula:['acumula','mes'],dinheiro:['reembolso','cashback']};
+const stem=w=>w.length>4&&w.endsWith('s')?w.slice(0,-1):w;
+const tok=s=>norm(s).split(/[^a-z0-9]+/).filter(w=>w&&!STOP.has(w)).map(stem);
+const docs=[];
+document.querySelectorAll('#faq details').forEach(d=>{const q=d.querySelector('summary').textContent,a=d.querySelector('p').cloneNode(true);a.querySelectorAll('.ph').forEach(x=>x.remove());docs.push({q,a:a.textContent.trim(),src:'Dúvidas frequentes',t:tok(q+' '+q+' '+a.textContent)})});
+document.querySelectorAll('.reg-body h2').forEach(h=>{let n=h.nextElementSibling;while(n&&n.tagName!=='H2'){(n.tagName==='UL'?[...n.children]:[n]).forEach(li=>{const c=li.cloneNode(true);c.querySelectorAll('.ph').forEach(x=>x.remove());const tx=c.textContent.trim();if(tx.length>12)docs.push({q:h.textContent,a:tx,src:'Regulamento, '+h.textContent.replace(/^\d+\.\s*/,''),t:tok(h.textContent+' '+tx)})});n=n.nextElementSibling}});
+const df={};docs.forEach(d=>new Set(d.t).forEach(w=>df[w]=(df[w]||0)+1));
+const avg=docs.reduce((s,d)=>s+d.t.length,0)/docs.length;
+function ask(q){let qt=tok(q);const ex=[];qt.forEach(w=>{(SYN[w]||[]).forEach(s=>ex.push(stem(s)))});qt=[...new Set(qt.concat(ex))];
+  const sc=docs.map((d,i)=>{let s=0;const tf={};d.t.forEach(w=>tf[w]=(tf[w]||0)+1);
+    qt.forEach(w=>{if(!tf[w])return;const idf=Math.log(1+(docs.length-df[w]+.5)/(df[w]+.5));s+=idf*(tf[w]*2.2)/(tf[w]+1.2*(.25+.75*d.t.length/avg))});
+    if(d.src==='Dúvidas frequentes')s*=1.15;return{i,s}}).sort((a,b)=>b.s-a.s);
+  return sc[0]&&sc[0].s>1.2?{best:docs[sc[0].i],alt:sc[1]&&sc[1].s>sc[0].s*.8&&docs[sc[1].i].a!==docs[sc[0].i].a?docs[sc[1].i]:null}:null}
+
+/* busca no FAQ */
+const fq=document.getElementById('fq'),items=[...document.querySelectorAll('#faq details')];
+items.forEach(d=>{d.dataset.q=d.querySelector('summary').textContent;d.dataset.a=d.querySelector('p').innerHTML});
+fq.addEventListener('input',()=>{const v=fq.value.trim();const ts=tok(v);let n=0;
+  items.forEach(d=>{const s=d.querySelector('summary'),p=d.querySelector('p');s.textContent=d.dataset.q;p.innerHTML=d.dataset.a;
+    if(!ts.length){d.hidden=false;d.open=false;n++;return}
+    const t=norm(d.textContent);const hit=ts.some(w=>t.includes(w));d.hidden=!hit;if(hit){n++;d.open=true;
+      const rx=new RegExp('('+ts.map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','gi');
+      [s,p].forEach(el=>{[...el.childNodes].forEach(c=>{if(c.nodeType!==3)return;const raw=c.textContent,nr=norm(raw);let out='',last=0;nr.replace(rx,(m,_g,off)=>{out+=esc(raw.slice(last,off))+'<mark>'+esc(raw.slice(off,off+m.length))+'</mark>';last=off+m.length});if(last){out+=esc(raw.slice(last));const sp=document.createElement('span');sp.innerHTML=out;c.replaceWith(sp)}})})}});
+  document.getElementById('nores').style.display=n?'none':'block'});
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+/* assistente */
+const fab=document.getElementById('fab'),chat=document.getElementById('chat'),msgs=document.getElementById('msgs'),cf=document.getElementById('cf'),ci=document.getElementById('ci'),sugs=document.getElementById('sugs');
+const SUG=['Quanto custa?','Como uso o cupom de R$ 50?','Vale no site?','Quem a assistência funeral cobre?','Como cancelo?','O cashback acumula?'];
+sugs.innerHTML=SUG.map(s=>'<button type="button">'+esc(s)+'</button>').join('');
+let greeted=false;
+function toggle(open){chat.classList.toggle('open',open);fab.setAttribute('aria-expanded',String(open));if(open){if(!greeted){greeted=true;bot('Oi! Eu respondo qualquer dúvida sobre o Sócio Baianão na hora, direto do regulamento. Pergunte do seu jeito.',null)}setTimeout(()=>ci.focus(),300)}}
+fab.addEventListener('click',()=>toggle(!chat.classList.contains('open')));
+document.getElementById('xchat').addEventListener('click',()=>toggle(false));
+addEventListener('keydown',e=>{if(e.key==='Escape')toggle(false)});
+function add(cls,html){const d=document.createElement('div');d.className='m '+cls;d.innerHTML=html;msgs.append(d);msgs.scrollTop=msgs.scrollHeight;return d}
+function bot(text,src){const d=add('bot','<span class="typing"><i></i><i></i><i></i></span>');
+  setTimeout(()=>{d.textContent='';const sp=document.createElement('span');d.append(sp);let i=0;const words=text.split(' ');
+    const tick=()=>{sp.textContent=words.slice(0,++i).join(' ');msgs.scrollTop=msgs.scrollHeight;if(i<words.length)setTimeout(tick,REDUCE?0:28);else{
+      if(src){const s=document.createElement('span');s.className='src';s.textContent='Fonte: '+src;d.append(s)}
+      if('speechSynthesis' in window){const b=document.createElement('button');b.className='say';b.type='button';b.textContent='▶ Ouvir resposta';b.addEventListener('click',()=>{try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang='pt-BR';u.rate=1.02;const v=speechSynthesis.getVoices().find(v=>/pt-BR/i.test(v.lang));if(v)u.voice=v;speechSynthesis.speak(u)}catch(_){}});d.append(b)}}};tick()},REDUCE?0:520)}
+function answer(q){add('me',esc(q));const r=ask(q);
+  if(!r){bot('Não encontrei isso no regulamento do clube. Fale com um vendedor em qualquer loja Baianão ou pelo WhatsApp, que ele te ajuda.',null);return}
+  let t=r.best.a;if(r.alt)t+=' E sobre “'+r.alt.q.trim()+'”: '+r.alt.a;bot(t,r.best.src)}
+cf.addEventListener('submit',e=>{e.preventDefault();const q=ci.value.trim();if(!q)return;ci.value='';answer(q)});
+sugs.addEventListener('click',e=>{const b=e.target.closest('button');if(b)answer(b.textContent)});
+document.getElementById('nores').addEventListener('click',()=>{toggle(true);if(fq.value.trim())answer(fq.value.trim())});
+}
+});
+</script>
+</body>
+</html>
