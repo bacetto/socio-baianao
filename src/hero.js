@@ -37,25 +37,17 @@ async function start(){
   const aniso=Math.min(8,renderer.capabilities.getMaxAnisotropy());
   const tex=c=>{const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=aniso;return t};
 
-  /* ---- logo 3D ---- */
-  const U=100;
-  const lc=document.createElement('canvas');lc.width=LW*2;lc.height=LH*2;const lg=lc.getContext('2d');lg.imageSmoothingQuality='high';lg.drawImage(logo,0,0,lc.width,lc.height);
-  const logoTex=tex(lc);
-  const wc=document.createElement('canvas');wc.width=lc.width;wc.height=lc.height;const wg=wc.getContext('2d',{willReadFrequently:true});wg.drawImage(lc,0,0);
-  const id=wg.getImageData(0,0,wc.width,wc.height),d=id.data;
-  for(let i=0;i<d.length;i+=4){const m=Math.min(d[i],d[i+1],d[i+2]);const a=Math.max(0,Math.min(1,(m-120)/110))*(d[i+3]/255);d[i]=d[i+1]=d[i+2]=255;d[i+3]=a*255}
-  wg.putImageData(id,0,0);const whiteTex=tex(wc);
-  const pill=(w,h,r)=>{const s=new THREE.Shape(),x=-w/2,y=-h/2;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);return s};
-  const shear=new THREE.Matrix4().set(1,.23,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1);
-  const pillGeo=(depth)=>{const g=new THREE.ExtrudeGeometry(pill(5.95,1.72,.62),{depth,bevelEnabled:true,bevelThickness:.08,bevelSize:.06,bevelSegments:3,curveSegments:14});g.applyMatrix4(shear);g.translate(0,0,-depth-.08);return g};
-  const geoP=pillGeo(.55);
+  /* ---- marca 3D do Sócio Baianão (imagem + camadas de espessura) ---- */
+  const mark=new Image();mark.src='img/socio-baianao.webp';await mark.decode();
+  const MW=6.4,MH=MW*mark.naturalHeight/mark.naturalWidth;
+  const markTex=new THREE.Texture(mark);markTex.colorSpace=THREE.SRGBColorSpace;markTex.anisotropy=aniso;markTex.needsUpdate=true;
+  const sil=document.createElement('canvas');sil.width=mark.naturalWidth;sil.height=mark.naturalHeight;const sg=sil.getContext('2d');sg.drawImage(mark,0,0);sg.globalCompositeOperation='source-in';sg.fillStyle='#fff';sg.fillRect(0,0,sil.width,sil.height);
+  const silTex=tex(sil);
+  const planeG=new THREE.PlaneGeometry(MW,MH);
   const L=new THREE.Group();
-  const blue=new THREE.Mesh(geoP,new THREE.MeshPhysicalMaterial({color:0x0046B0,roughness:.28,metalness:.15,clearcoat:1,clearcoatRoughness:.12}));blue.position.set(.02,.125,-.005);L.add(blue);
-  const red=new THREE.Mesh(geoP,new THREE.MeshStandardMaterial({color:0xF7040F,roughness:.3,metalness:.15}));red.position.set(-.1,-.12,-.2);L.add(red);
-  const planeG=new THREE.PlaneGeometry(LW/U,LH/U);
-  const face=new THREE.Mesh(planeG,new THREE.MeshStandardMaterial({map:logoTex,alphaTest:.5,roughness:.3}));face.position.z=.002;L.add(face);
-  for(let k=1;k<=5;k++){const m=new THREE.MeshStandardMaterial({map:whiteTex,alphaTest:.5,color:k===5?0xffffff:new THREE.Color().setHSL(.61,.3,.62+k*.05),roughness:.4});
-    const pl=new THREE.Mesh(planeG,m);pl.position.z=.004+k*.016;L.add(pl)}
+  const face=new THREE.Mesh(planeG,new THREE.MeshStandardMaterial({map:markTex,alphaTest:.5,roughness:.32,metalness:.05}));face.position.z=.001;face.renderOrder=2;L.add(face);
+  const DEP=8;for(let k=1;k<=DEP;k++){const c=new THREE.Color().lerpColors(new THREE.Color(0x0d2a8a),new THREE.Color(0x050f3a),k/DEP);
+    const pl=new THREE.Mesh(planeG,new THREE.MeshStandardMaterial({map:silTex,alphaTest:.5,color:c,roughness:.45,metalness:.2,side:k===DEP?THREE.DoubleSide:THREE.FrontSide}));pl.position.z=-k*.03;L.add(pl)}
   scene.add(L);
 
   /* ---- moedas ---- */
@@ -89,8 +81,8 @@ async function start(){
     if(t.bloom){ensureComposer();comp.setPixelRatio(Math.min(devicePixelRatio,t.dpr));comp.setSize(W,H);bloom.resolution.set(W/2,H/2)}
     inst.count=Math.max(8,Math.round(N*t.coins));host.dataset.q=tier}
   function size(){W=host.clientWidth;H=host.clientHeight;cam.aspect=W/H;cam.updateProjectionMatrix();
-    const wide=W>760;cx=wide?Math.min(5.4,(W/H)*2.75):0;cy=wide?.2:3.1;
-    const visW=2*Math.tan(cam.fov*Math.PI/360)*15*cam.aspect;ls=wide?Math.min(.95,visW*.33/6.4):Math.min(.95,visW*.86/6.4);applyTier()}
+    const wide=W>760;cx=wide?Math.min(5.8,(W/H)*2.95):0;cy=wide?.2:3.1;
+    const visW=2*Math.tan(cam.fov*Math.PI/360)*15*cam.aspect,visH=visW/cam.aspect;ls=wide?Math.min(1,visW*.32/6.4,visH*.58/4):Math.min(.95,visW*.7/6.4);if(!wide)cy=visH*.5-2.4*ls-.55;applyTier()}
   new ResizeObserver(size).observe(host);size();
 
   let mx=0,my=0,tx=0,ty=0,sy=0;
@@ -120,7 +112,7 @@ async function start(){
     const burst=easeOut(Math.min(1,T/(INTRO+.6||1)));const n=inst.count;const mv=reduce?0:1;
     for(let i=0;i<n;i++){const p=P[i];p.a+=p.sp*dt*mv;p.y-=p.f*dt*mv;if(p.y<-8)p.y=8;
       const r=p.r*(.15+.85*burst);
-      v.set(cx+Math.cos(p.a)*r,cy+p.y*burst,Math.sin(p.a)*r*.45-2.6);
+      v.set(cx+Math.cos(p.a)*r,cy+p.y*burst,-1.6-Math.abs(Math.sin(p.a))*r*.55);
       eu.set(p.rx+mt*p.vx,p.ry+mt*p.vy,0);q.setFromEuler(eu);sc.setScalar(p.s*Math.min(1,burst*1.4));m.compose(v,q,sc);inst.setMatrixAt(i,m)}
     inst.instanceMatrix.needsUpdate=true;
     if(TIERS[tier].bloom)comp.render();else renderer.render(scene,cam);

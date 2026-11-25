@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800;900&family=Inter:wght@400;500;600&display=swap">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" href="img/logo.webp" as="image" type="image/webp">
+<link rel="preload" href="img/socio-baianao.webp" as="image" type="image/webp">
 <link rel="modulepreload" href="js/hero.js">
 <script defer src="js/gsap.min.js"></script>
 <script defer src="js/ScrollTrigger.min.js"></script>
@@ -75,7 +76,7 @@ header .btn{min-height:42px;padding:9px 20px;font-size:.9rem}
 #gl{position:absolute;inset:0;z-index:0;opacity:0;transition:opacity 1s}
 #gl.on,#gl.nogl{opacity:1}
 #gl canvas{width:100%!important;height:100%!important;display:block}
-#gl.nogl{background:url(img/logo.webp) 78% 45%/min(42vw,560px) auto no-repeat,radial-gradient(ellipse 60% 70% at 70% 42%,#1c6cff,#00388A 52%,#001A4D)}
+#gl.nogl{background:url(img/socio-baianao.webp) 78% 45%/min(40vw,520px) auto no-repeat,radial-gradient(ellipse 60% 70% at 70% 42%,#1c6cff,#00388A 52%,#001A4D)}
 .hero::before{content:"";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(0,26,77,.85) 0,rgba(0,26,77,.45) 36%,rgba(0,26,77,0) 58%)}
 .kv{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
 .kv i{position:absolute;left:-10%;width:120%;transform:rotate(-7deg)}
@@ -316,7 +317,7 @@ footer a{color:var(--on)}
   .hero{background:radial-gradient(ellipse 120% 70% at 50% 30%,#0C2FA8 0%,var(--navy) 70%)}
   #gl{opacity:.9}
   .hero::before{background:linear-gradient(180deg,rgba(0,26,77,0) 20%,rgba(0,26,77,.8) 48%,rgba(0,26,77,.92) 100%)}
-  .hero-txt{padding-top:36vh}
+  .hero-txt{padding-top:42vh}
 }
 @media (max-width:520px){
   .grid4,.steps,.checks{grid-template-columns:minmax(0,1fr)}
